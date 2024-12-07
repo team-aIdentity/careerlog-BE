@@ -26,13 +26,13 @@ export class Profile {
   phone: string;
 
   @Column({ nullable: true })
-  birthDate: Date;
+  birthDate: string;
 
   @Column({ nullable: true })
   careerGoal: string;
 
   @Column({ nullable: true })
-  expectSalary: number;
+  expectSalary: string;
 
   @ManyToOne(() => Culture, (culture) => culture.profiles)
   expectCulture: Culture;

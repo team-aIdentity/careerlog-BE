@@ -12,6 +12,7 @@ import { Role } from './entity/role.entity';
 import { UserOAuth } from './entity/userOAuth.entity';
 import { UserRole } from './entity/userRole.entity';
 import { ConfigModule } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -28,7 +29,7 @@ import { ConfigModule } from '@nestjs/config';
     ]),
     ConfigModule,
   ],
-  providers: [UserService],
+  providers: [UserService, JwtService],
   controllers: [UserController],
   exports: [TypeOrmModule],
 })
