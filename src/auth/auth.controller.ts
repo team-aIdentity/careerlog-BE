@@ -20,7 +20,6 @@ import { RefreshTokenDto } from './dto/refreshToken.dto';
 import { JwtAccessAuthGuard } from './jwt/jwtAccessAuth.guard';
 import { JwtRefreshGuard } from './jwt/jwtRefresh.guard';
 import { KakaoAuthGuard } from './kakao/kakaoAuth.guard';
-import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {

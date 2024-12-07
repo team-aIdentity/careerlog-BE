@@ -21,7 +21,7 @@ export class User {
   @Column({ nullable: false, update: false })
   email: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, select: false })
   password: string;
 
   @OneToOne(() => Profile, (profile) => profile.user, { cascade: true })

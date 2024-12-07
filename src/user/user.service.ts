@@ -39,11 +39,22 @@ export class UserService {
     });
   }
 
-  findOneByEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOne({
-      where: { email },
-      relations: ['profile'],
-    });
+  async findOneByEmail(
+    email: string,
+    needPwd: boolean = false,
+  ): Promise<User | null> {
+    const query = this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .where('user.email = :email', { email });
+
+    if (needPwd) {
+      query.addSelect('user.password');
+    }
+
+    const user = await query.getOne();
+
+    return user || null;
   }
 
   async findOneWithProvider(
