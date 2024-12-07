@@ -33,11 +33,33 @@ export class UserService {
   }
 
   findOne(id: number): Promise<User | null> {
-    return this.userRepository.findOneBy({ id });
+    return this.userRepository.findOne({
+      where: { id },
+      relations: ['profile'],
+    });
   }
 
   findOneByEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOneBy({ email });
+    return this.userRepository.findOne({
+      where: { email },
+      relations: ['profile'],
+    });
+  }
+
+  async findOneWithProvider(
+    provider: string,
+    providerUserId: string,
+  ): Promise<User> {
+    const userOAuth = await this.userOAuthRepository.findOne({
+      where: { provider: { name: provider }, providerUserId },
+      relations: ['user'],
+    });
+
+    if (!userOAuth) {
+      return null;
+    }
+
+    return this.findOne(userOAuth.user.id);
   }
 
   // async remove(id: number): Promise<void> {
@@ -52,6 +74,7 @@ export class UserService {
     refreshToken: string,
     isMobile: boolean,
     provider: string,
+    providerUserId?: string,
   ) {
     const currentRefreshToken =
       await this.getCurrentHashedRefreshToken(refreshToken);
@@ -74,6 +97,7 @@ export class UserService {
         deviceId,
         refreshToken: currentRefreshToken,
         refreshTokenExp: currentRefreshTokenExp,
+        providerUserId,
       });
     }
   }
@@ -160,9 +184,11 @@ export class UserService {
     const createdUser = await this.userRepository.create({
       email,
       password,
-      name,
-      birthDate,
-      phone,
+      profile: {
+        name,
+        birthDate,
+        phone,
+      },
     });
     await this.userRepository.save(createdUser);
     return createdUser;

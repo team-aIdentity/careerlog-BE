@@ -2,7 +2,6 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -25,17 +24,7 @@ export class User {
   @Column({ nullable: true })
   password: string;
 
-  @Column({ nullable: false })
-  name: string;
-
-  @Column({ nullable: false })
-  phone: string;
-
-  @Column({ nullable: true })
-  birthDate: Date;
-
-  @OneToOne(() => Profile, (profile) => profile.user)
-  @JoinColumn()
+  @OneToOne(() => Profile, (profile) => profile.user, { cascade: true })
   profile: Profile;
 
   @OneToMany(() => Career, (career) => career.user)

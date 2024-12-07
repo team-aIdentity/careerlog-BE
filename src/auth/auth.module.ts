@@ -11,6 +11,8 @@ import { UserService } from 'src/user/user.service';
 import { JwtRefreshStrategy } from './jwt/jwtRefresh.strategy';
 import { JwtAccessAuthGuard } from './jwt/jwtAccessAuth.guard';
 import { JwtRefreshGuard } from './jwt/jwtRefresh.guard';
+import { KakaoAuthGuard } from './kakao/kakaoAuth.guard';
+import { KakaoStrategy } from './kakao/kakao.strategy';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { JwtRefreshGuard } from './jwt/jwtRefresh.guard';
     JwtRefreshStrategy,
     JwtAccessAuthGuard,
     JwtRefreshGuard,
+    KakaoAuthGuard,
+    KakaoStrategy,
   ],
   controllers: [AuthController],
   exports: [UserService, AuthService],
