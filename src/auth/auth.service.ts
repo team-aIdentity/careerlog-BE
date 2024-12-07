@@ -29,7 +29,10 @@ export class AuthService {
    * @returns Promise<User>
    */
   async validateCredentialUser(loginDto: LoginDto): Promise<User> {
-    const user: User = await this.userService.findOneByEmail(loginDto.email);
+    const user: User = await this.userService.findOneByEmail(
+      loginDto.email,
+      true,
+    );
     if (!user) {
       throw new BadRequestException('User Not Found');
     }
