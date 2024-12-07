@@ -45,6 +45,25 @@ export class AuthService {
     return user;
   }
 
+  async validateKakaoUser(reqUser: any): Promise<any> {
+    let user: User = await this.userService.findOneWithProvider(
+      reqUser.provider,
+      reqUser.providerUserId,
+    );
+
+    if (!user) {
+      user = await this.userService.register(
+        reqUser.email,
+        null,
+        reqUser.name,
+        reqUser.birthDate,
+        reqUser.phone,
+      );
+    }
+
+    return { ...user, providerUserId: reqUser.providerUserId };
+  }
+
   // common logic for authetication
 
   /**
@@ -53,7 +72,7 @@ export class AuthService {
    * @returns Promise<string>
    */
   async generateAccessToken(user: User): Promise<string> {
-    const payload = { id: user.id, email: user.email, name: user.name };
+    const payload = { id: user.id, email: user.email, name: user.profile.name };
     return this.jwtService.signAsync(payload, {
       secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
     });
@@ -66,7 +85,7 @@ export class AuthService {
    * @returns Promise<string>
    */
   async generateRefreshToken(user: User, isMobile: boolean): Promise<string> {
-    const payload = { id: user.id, email: user.email, name: user.name };
+    const payload = { id: user.id, email: user.email, name: user.profile.name };
     return this.jwtService.signAsync(
       { id: payload.id },
       {

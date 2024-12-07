@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  HttpCode,
   Post,
   Req,
   Res,
@@ -18,6 +19,8 @@ import { User } from 'src/user/entity/user.entity';
 import { RefreshTokenDto } from './dto/refreshToken.dto';
 import { JwtAccessAuthGuard } from './jwt/jwtAccessAuth.guard';
 import { JwtRefreshGuard } from './jwt/jwtRefresh.guard';
+import { KakaoAuthGuard } from './kakao/kakaoAuth.guard';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
@@ -32,7 +35,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<any> {
     const user = await this.authService.validateCredentialUser(loginDto);
-    const acessToken = await this.authService.generateAccessToken(user);
+    const accessToken = await this.authService.generateAccessToken(user);
     const refreshToken = await this.authService.generateRefreshToken(
       user,
       loginDto.isMobile,
@@ -46,8 +49,8 @@ export class AuthController {
       'credential',
     );
 
-    res.setHeader('Authorization', 'Bearer ' + [acessToken, refreshToken]);
-    res.cookie('accessToken', acessToken, {
+    res.setHeader('Authorization', 'Bearer ' + [accessToken, refreshToken]);
+    res.cookie('accessToken', accessToken, {
       httpOnly: true,
     });
     res.cookie('refreshToken', refreshToken, {
@@ -58,7 +61,7 @@ export class AuthController {
     });
     return {
       message: 'login success',
-      acessToken: acessToken,
+      accessToken: accessToken,
       refreshToken: refreshToken,
     };
   }
@@ -107,5 +110,49 @@ export class AuthController {
   ): Promise<any> {
     const user = this.authService.signUp(registerDto);
     return user;
+  }
+
+  @Get('/kakao')
+  @UseGuards(KakaoAuthGuard)
+  async kakaoLogin1(@Req() req: Request) {
+    // 이 부분은 Passport의 AuthGuard에 의해 카카오 로그인 페이지로 리다이렉트
+  }
+
+  @Get('callback/kakao')
+  @UseGuards(KakaoAuthGuard)
+  @HttpCode(301)
+  async kakaoLogin(@Req() req: any, @Res() res: Response) {
+    const user = await this.authService.validateKakaoUser(req.user);
+    const accessToken = await this.authService.generateAccessToken(user);
+    const refreshToken = await this.authService.generateRefreshToken(
+      user,
+      true,
+    );
+
+    await this.userService.setUserOAuth(
+      user.id,
+      'kakao',
+      refreshToken,
+      true,
+      'kakao',
+      user.providerUserId,
+    );
+
+    res.setHeader('Authorization', 'Bearer ' + [accessToken, refreshToken]);
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+    });
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+    });
+    res.cookie('deviceId', 'kakao', {
+      httpOnly: true,
+    });
+
+    return res.send({
+      message: 'login success',
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
   }
 }

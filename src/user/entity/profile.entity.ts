@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -15,8 +16,17 @@ export class Profile {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: false })
+  name: string;
+
   @Column({ nullable: true })
   image: string;
+
+  @Column({ nullable: true })
+  phone: string;
+
+  @Column({ nullable: true })
+  birthDate: Date;
 
   @Column({ nullable: true })
   careerGoal: string;
@@ -28,6 +38,7 @@ export class Profile {
   expectCulture: Culture;
 
   @OneToOne(() => User, (user) => user.profile)
+  @JoinColumn()
   user: User;
 
   @CreateDateColumn()
