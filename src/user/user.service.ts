@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from './entity/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,6 +8,8 @@ import { UserOAuth } from './entity/userOAuth.entity';
 import { Role } from './entity/role.entity';
 import { UserRole } from './entity/userRole.entity';
 import { OAuthProvider } from './entity/oAuthProvider.entity';
+import { UpdateProfileDto } from './dto/updateProfile.dto';
+import { Profile } from './entity/profile.entity';
 
 @Injectable()
 export class UserService {
@@ -24,12 +26,27 @@ export class UserService {
     private userRoleRepository: Repository<UserRole>,
     @InjectRepository(OAuthProvider)
     private oAuthProvider: Repository<OAuthProvider>,
+    @InjectRepository(Profile)
+    private profileRepository: Repository<Profile>,
   ) {}
 
   // user feature
 
-  findAll(): Promise<User[]> {
-    return this.userRepository.find();
+  async findAll(take: number, page: number): Promise<any> {
+    const [users, total] = await this.userRepository.findAndCount({
+      take,
+      skip: (page - 1) * take,
+      relations: ['profile', 'roles', 'roles.role'],
+    });
+
+    return {
+      data: users,
+      meta: {
+        total,
+        page,
+        last_page: Math.ceil(total / take),
+      },
+    };
   }
 
   findOne(id: number): Promise<User | null> {
@@ -71,6 +88,35 @@ export class UserService {
     }
 
     return this.findOne(userOAuth.user.id);
+  }
+
+  async updateProfile(userId: number, updateProfileDto: UpdateProfileDto) {
+    const profile: Profile = await this.profileRepository.findOne({
+      where: {
+        user: { id: userId },
+      },
+    });
+    if (!profile) {
+      throw new BadRequestException(
+        `Profile with user id ${userId} doesn't exist`,
+      );
+    }
+
+    if (updateProfileDto.name !== undefined)
+      profile.name = updateProfileDto.name;
+    if (updateProfileDto.image !== undefined)
+      profile.image = updateProfileDto.image;
+    if (updateProfileDto.phone !== undefined)
+      profile.phone = updateProfileDto.phone;
+    if (updateProfileDto.birthDate !== undefined)
+      profile.birthDate = updateProfileDto.birthDate;
+    if (updateProfileDto.careerGoal !== undefined)
+      profile.careerGoal = updateProfileDto.careerGoal;
+    if (updateProfileDto.expectSalary !== undefined)
+      profile.expectSalary = updateProfileDto.expectSalary;
+
+    await this.profileRepository.save(profile);
+    return profile;
   }
 
   // async remove(id: number): Promise<void> {
