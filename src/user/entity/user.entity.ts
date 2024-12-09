@@ -13,13 +13,18 @@ import { UserRole } from './userRole.entity';
 import { Academic } from './academic.entity';
 import { UserOAuth } from './userOAuth.entity';
 import { Article } from 'src/article/entity/article.entity';
+import { SavedArticle } from 'src/article/entity/savedArticle.entity';
+import { OAuthProvider } from './oAuthProvider.entity';
+import { Product } from 'src/product/entity/product.entity';
+import { SavedProduct } from 'src/product/entity/savedProduct.entity';
+import { Cart } from 'src/product/entity/cart.entity';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false, update: false })
+  @Column({ nullable: false, unique: true, update: false })
   email: string;
 
   @Column({ nullable: true, select: false })
@@ -32,19 +37,33 @@ export class User {
   careers: Career[];
 
   @OneToMany(() => UserRole, (userRole) => userRole.user)
-  roles: UserRole[];
+  userRoles: UserRole[];
 
   @OneToMany(() => Academic, (academic) => academic.user)
   academics: Academic[];
 
   @OneToMany(() => UserOAuth, (userOAuth) => userOAuth.user)
-  providers: UserOAuth[];
+  providers: OAuthProvider[];
 
   @OneToMany(() => Article, (article) => article.user)
   articles: Article[];
 
+  @OneToMany(() => SavedArticle, (savedArticle) => savedArticle.user)
+  savedArticles: SavedArticle[];
+
+  @OneToMany(() => Product, (product) => product.user, { eager: true })
+  products: Product[];
+
+  @OneToMany(() => SavedProduct, (savedProduct) => savedProduct.user, {
+    eager: true,
+  })
+  savedProducts: SavedProduct[];
+
+  @OneToMany(() => Cart, (cart) => cart.user)
+  cart: Cart[];
+
   @CreateDateColumn()
-  createAt: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;

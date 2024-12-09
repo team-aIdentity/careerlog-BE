@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateArticleDto } from './dto/createArticle.dto';
 import { UpdateArticleDto } from './dto/updateArticle.dto';
 import { UserService } from 'src/user/user.service';
+import { SavedArticle } from './entity/savedArticle.entity';
 
 @Injectable()
 export class ArticleService {
@@ -13,6 +14,8 @@ export class ArticleService {
 
     @InjectRepository(Article)
     private articleRepository: Repository<Article>,
+    @InjectRepository(SavedArticle)
+    private savedArticleRepository: Repository<SavedArticle>,
   ) {}
 
   async findAll(take: number, page: number): Promise<any> {
@@ -54,6 +57,7 @@ export class ArticleService {
     const article = await this.articleRepository.create({
       title: createArticleDto.title,
       content: createArticleDto.content,
+      thumbnail: createArticleDto.thumbnail,
       user: { id: userId },
     });
     await this.articleRepository.save(article);
@@ -77,6 +81,9 @@ export class ArticleService {
     if (updateArticleDto.content !== undefined)
       article.content = updateArticleDto.content;
 
+    if (updateArticleDto.thumbnail !== undefined)
+      article.thumbnail = updateArticleDto.thumbnail;
+
     this.articleRepository.save(article);
     return article;
   }
@@ -84,7 +91,7 @@ export class ArticleService {
   async findOne(articleId: number) {
     const article = await this.articleRepository.findOne({
       where: { id: articleId },
-      relations: ['user', 'user.roles', 'user.roles.role'],
+      relations: ['user', 'user.userRoles', 'user.userRoles.role'],
     });
 
     if (!article) {
@@ -101,14 +108,8 @@ export class ArticleService {
 
     const articles = await this.articleRepository
       .createQueryBuilder('article')
-      .where(
-        "to_tsvector('english', article.content) @@ plainto_tsquery(:keyword)",
-        { keyword },
-      )
-      .orWhere(
-        "to_tsvector('english', article.title) @@ plainto_tsquery(:keyword)",
-        { keyword },
-      )
+      .where('article.content LIKE :keyword', { keyword: `%${keyword}%` })
+      .orWhere('article.title LIKE :keyword', { keyword: `%${keyword}%` })
       .leftJoinAndSelect('article.user', 'user')
       .getMany();
 
@@ -127,5 +128,39 @@ export class ArticleService {
       throw new BadRequestException('user is now the owner for this article');
 
     return await this.articleRepository.delete({ id: articleId });
+  }
+
+  async addViewCount(articleId: number) {
+    await this.articleRepository
+      .createQueryBuilder()
+      .update()
+      .set({
+        viewCount: () => 'viewCount + 1',
+      })
+      .where('id = :id', { id: articleId })
+      .execute();
+  }
+
+  async saveArticle(userId: number, articleId: number) {
+    const savedArticle = await this.savedArticleRepository.findOneBy({
+      user: { id: userId },
+      article: { id: articleId },
+    });
+
+    if (savedArticle) {
+      throw new BadRequestException('user already saved this article');
+    }
+
+    await this.savedArticleRepository.save({
+      user: { id: userId },
+      article: { id: articleId },
+    });
+  }
+
+  async unsaveArticle(userId: number, articleId: number) {
+    return await this.savedArticleRepository.delete({
+      user: { id: userId },
+      article: { id: articleId },
+    });
   }
 }

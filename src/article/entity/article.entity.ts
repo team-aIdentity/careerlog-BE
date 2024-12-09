@@ -4,9 +4,11 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { SavedArticle } from './savedArticle.entity';
 
 @Entity()
 export class Article {
@@ -19,8 +21,17 @@ export class Article {
   @Column()
   content: string;
 
+  @Column({ nullable: true })
+  thumbnail: string;
+
+  @Column({ default: 0 })
+  viewCount: number;
+
   @ManyToOne(() => User, (user) => user.articles)
   user: User;
+
+  @OneToMany(() => SavedArticle, (savedArticle) => savedArticle.article)
+  userSaved: SavedArticle[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -36,7 +36,7 @@ export class UserService {
     const [users, total] = await this.userRepository.findAndCount({
       take,
       skip: (page - 1) * take,
-      relations: ['profile', 'roles', 'roles.role'],
+      relations: ['profile', 'userRoles', 'providers'],
     });
 
     return {
@@ -52,7 +52,15 @@ export class UserService {
   findOne(id: number): Promise<User | null> {
     return this.userRepository.findOne({
       where: { id },
-      relations: ['profile'],
+      relations: [
+        'profile',
+        'userRoles',
+        'providers',
+        'careers',
+        'academics',
+        'articles',
+        'savedArticles',
+      ],
     });
   }
 
@@ -63,15 +71,27 @@ export class UserService {
     const query = this.userRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.profile', 'profile')
+      .leftJoinAndSelect('user.userRoles', 'userRoles')
+      .leftJoinAndSelect('userRoles.role', 'role')
+      .leftJoinAndSelect('user.providers', 'providers')
+      .leftJoinAndSelect('providers.provider', 'provider')
+      .leftJoinAndSelect('user.careers', 'careers')
+      .leftJoinAndSelect('user.academics', 'academics')
+      .leftJoinAndSelect('user.articles', 'articles')
+      .leftJoinAndSelect('user.savedArticles', 'savedArticles')
       .where('user.email = :email', { email });
 
     if (needPwd) {
       query.addSelect('user.password');
     }
 
-    const user = await query.getOne();
-
-    return user || null;
+    try {
+      const user = await query.getOne();
+      return user || null;
+    } catch (error) {
+      console.error('Error fetching user by email:', error);
+      throw new Error('Could not fetch user by email');
+    }
   }
 
   async findOneWithProvider(

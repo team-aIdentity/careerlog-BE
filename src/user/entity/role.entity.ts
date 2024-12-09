@@ -13,17 +13,17 @@ export class Role {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false, update: false })
+  @Column({ nullable: true, unique: true, length: 50 })
   name: string;
 
-  @Column({ nullable: true, update: true })
+  @Column({ nullable: true, length: 255 })
   description: string;
 
   @OneToMany(() => UserRole, (userRole) => userRole.role)
   userRoles: UserRole[];
 
   @CreateDateColumn()
-  createAt: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;

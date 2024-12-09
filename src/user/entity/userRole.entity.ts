@@ -13,13 +13,16 @@ export class UserRole {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ default: 'active' })
+  @Column({ length: 50, default: 'active' })
   status: string;
 
-  @ManyToOne(() => User, (user) => user.roles, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.userRoles, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => Role, (role) => role.userRoles, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Role, (role) => role.userRoles, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
   role: Role;
 
   @CreateDateColumn()

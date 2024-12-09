@@ -13,6 +13,9 @@ import { UserOAuth } from './entity/userOAuth.entity';
 import { UserRole } from './entity/userRole.entity';
 import { ConfigModule } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { SavedArticle } from 'src/article/entity/savedArticle.entity';
+import { Product } from 'src/product/entity/product.entity';
+import { SavedProduct } from 'src/product/entity/savedProduct.entity';
 
 @Module({
   imports: [
@@ -26,6 +29,9 @@ import { JwtService } from '@nestjs/jwt';
       Role,
       UserOAuth,
       UserRole,
+      SavedArticle,
+      Product,
+      SavedProduct,
     ]),
     ConfigModule,
   ],
