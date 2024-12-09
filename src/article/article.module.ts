@@ -11,11 +11,19 @@ import { UserRole } from 'src/user/entity/userRole.entity';
 import { Role } from 'src/user/entity/role.entity';
 import { Profile } from 'src/user/entity/profile.entity';
 import { JwtService } from '@nestjs/jwt';
+import { SavedArticle } from './entity/savedArticle.entity';
 
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([Article, User, UserRole, Role, Profile]),
+    TypeOrmModule.forFeature([
+      Article,
+      User,
+      UserRole,
+      Role,
+      Profile,
+      SavedArticle,
+    ]),
     UserModule,
   ],
   providers: [ArticleService, UserService, JwtService],

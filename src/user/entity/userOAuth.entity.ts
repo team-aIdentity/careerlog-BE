@@ -2,10 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 import { OAuthProvider } from './oAuthProvider.entity';
@@ -17,21 +19,24 @@ export class UserOAuth {
   id: number;
 
   @Column({ nullable: false })
+  @Index()
   deviceId: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, length: 255 })
   providerUserId: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, length: 255, select: false })
   refreshToken: string;
 
   @Column({ nullable: true })
   refreshTokenExp: Date;
 
-  @ManyToOne(() => User, (user) => user.providers)
+  @ManyToOne(() => User, (user) => user.providers, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => OAuthProvider, (oAuthProvider) => oAuthProvider.userOAuths)
+  @ManyToOne(() => OAuthProvider, (oAuthProvider) => oAuthProvider.users, {
+    eager: true,
+  })
   provider: OAuthProvider;
 
   @CreateDateColumn()
@@ -39,4 +44,7 @@ export class UserOAuth {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }

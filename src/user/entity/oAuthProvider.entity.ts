@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { UserOAuth } from './userOAuth.entity';
+import { User } from './user.entity';
 
 @Entity()
 export class OAuthProvider {
@@ -20,7 +21,7 @@ export class OAuthProvider {
   description: string;
 
   @OneToMany(() => UserOAuth, (userOAuth) => userOAuth.provider)
-  userOAuths: UserOAuth[];
+  users: User[];
 
   @CreateDateColumn()
   createdAt: Date;

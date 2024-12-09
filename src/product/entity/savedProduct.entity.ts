@@ -1,6 +1,5 @@
 import { User } from 'src/user/entity/user.entity';
 import {
-  Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
@@ -12,21 +11,15 @@ import { Product } from './product.entity';
 
 @Entity()
 @Unique(['user', 'product'])
-export class Cart {
+export class SavedProduct {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.cart)
+  @ManyToOne(() => User, (user) => user.savedProducts)
   user: User;
 
-  @ManyToOne(() => Product, (product) => product.cart, { eager: true })
+  @ManyToOne(() => Product, (product) => product.userSaved, { eager: true })
   product: Product;
-
-  @Column({ nullable: true })
-  expiedIn: Date;
-
-  @Column({ default: false })
-  isBought: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

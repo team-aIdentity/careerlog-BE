@@ -8,4 +8,8 @@ export class UpdateArticleDto {
   @IsString()
   @IsOptional()
   content: string;
+
+  @IsString()
+  @IsOptional()
+  thumbnail: string;
 }

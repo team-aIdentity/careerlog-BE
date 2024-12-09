@@ -42,7 +42,6 @@ export class UserController {
   @Get()
   async getUserByEmail(@Query('email') email: string): Promise<User> {
     const user = await this.userService.findOneByEmail(email);
-    console.log(user);
 
     if (!user) {
       throw new BadRequestException(`user with email ${email} doesn't exist`);

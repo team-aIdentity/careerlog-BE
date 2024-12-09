@@ -29,23 +29,14 @@ export class ArticleController {
     return await this.articleService.findAll(pageSize, page);
   }
 
-  @Get(':id')
-  async getArticleById(@Param('id') articleId: number) {
-    return await this.articleService.findOne(articleId);
-  }
-
-  @Get('search/:keyword')
-  async searchArticle(@Param('keyword') keyword: string) {
-    return await this.articleService.findWithKeyword(keyword);
-  }
-
-  @Get()
+  @Get('my')
   @UseGuards(JwtAccessAuthGuard)
   async getMyArticles(
     @Req() req: any,
     @Query('pageSize') pageSize: number,
     @Query('page') page: number,
   ) {
+    console.log(pageSize);
     return await this.articleService.findAllWithUserId(
       pageSize,
       page,
@@ -53,7 +44,38 @@ export class ArticleController {
     );
   }
 
-  @Post()
+  @Get(':id')
+  async getArticleById(
+    @Req() req: any,
+    @Param('id') articleId: number,
+    @Res() res: Response,
+  ) {
+    const article = await this.articleService.findOne(articleId);
+    const oldCookies = req.cookies['viewCount'];
+    if (oldCookies) {
+      if (!oldCookies.includes(`[${articleId}]`)) {
+        res.cookie('viewCount', oldCookies + `[${articleId}]`, {
+          httpOnly: true,
+          path: '/',
+        });
+        this.articleService.addViewCount(articleId);
+      }
+      return res.send({ article });
+    }
+    res.cookie('viewCount', `[${articleId}]`, {
+      httpOnly: true,
+      path: '/',
+    });
+    this.articleService.addViewCount(articleId);
+    return res.send({ article });
+  }
+
+  @Get('search/:keyword')
+  async searchArticle(@Param('keyword') keyword: string) {
+    return await this.articleService.findWithKeyword(keyword);
+  }
+
+  @Post('my')
   @UseGuards(JwtAccessAuthGuard)
   async postArticle(
     @Req() req: any,
@@ -62,7 +84,7 @@ export class ArticleController {
     return await this.articleService.createOne(createArticleDto, req.user.id);
   }
 
-  @Put(':id')
+  @Put('my/:id')
   @UseGuards(JwtAccessAuthGuard)
   async updateArticle(
     @Req() req: any,
@@ -76,7 +98,7 @@ export class ArticleController {
     );
   }
 
-  @Delete(':id')
+  @Delete('my/:id')
   @UseGuards(JwtAccessAuthGuard)
   async deleteArticle(
     @Req() req: any,
@@ -93,6 +115,42 @@ export class ArticleController {
 
     return res.send({
       message: 'delete article success',
+    });
+  }
+
+  @Post('save/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  async saveArticle(
+    @Req() req: any,
+    @Param('id') articleId: number,
+    @Res() res: Response,
+  ) {
+    await this.articleService.saveArticle(req.user.id, articleId);
+    return res.send({
+      message: 'article saved successfully',
+    });
+  }
+
+  @Delete('save/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  async unsaveArticle(
+    @Req() req: any,
+    @Param('id') articleId: number,
+    @Res() res: Response,
+  ) {
+    const result = await this.articleService.unsaveArticle(
+      req.user.id,
+      articleId,
+    );
+
+    if (!result.affected) {
+      return res.send({
+        message: 'unsaving article failed',
+      });
+    }
+
+    return res.send({
+      message: 'article unsaved successfully',
     });
   }
 }

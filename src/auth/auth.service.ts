@@ -49,10 +49,7 @@ export class AuthService {
   }
 
   async validateKakaoUser(reqUser: any): Promise<any> {
-    let user: User = await this.userService.findOneWithProvider(
-      reqUser.provider,
-      reqUser.providerUserId,
-    );
+    let user: User = await this.userService.findOneByEmail(reqUser.email);
 
     if (!user) {
       user = await this.userService.register(
@@ -62,6 +59,7 @@ export class AuthService {
         reqUser.birthDate,
         reqUser.phone,
       );
+      await this.userService.assignRole(user.id, 'user');
     }
 
     return { ...user, providerUserId: reqUser.providerUserId };

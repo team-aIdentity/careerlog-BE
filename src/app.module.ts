@@ -18,6 +18,8 @@ import { ArticleModule } from './article/article.module';
 import { ArticleService } from './article/article.service';
 import { UserService } from './user/user.service';
 import { UserController } from './user/user.controller';
+import { ProductModule } from './product/product.module';
+import { ProductService } from './product/product.service';
 
 @Module({
   imports: [
@@ -33,6 +35,7 @@ import { UserController } from './user/user.controller';
     AdvertisementModule,
     CareerModule,
     ArticleModule,
+    ProductModule,
   ],
   controllers: [
     AppController,
@@ -41,6 +44,7 @@ import { UserController } from './user/user.controller';
     ProductController,
     ArticleController,
     UserController,
+    ProductController,
   ],
   providers: [
     AppService,
@@ -49,6 +53,7 @@ import { UserController } from './user/user.controller';
     AuthService,
     JwtService,
     ArticleService,
+    ProductService,
   ],
 })
 export class AppModule {}
