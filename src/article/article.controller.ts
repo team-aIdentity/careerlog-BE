@@ -66,7 +66,7 @@ export class ArticleController {
   @UseGuards(JwtAccessAuthGuard)
   async updateArticle(
     @Req() req: any,
-    @Param(':id') articleId: number,
+    @Param('id') articleId: number,
     @Body() updateArticleDto: UpdateArticleDto,
   ) {
     return await this.articleService.updateArticle(
@@ -85,7 +85,7 @@ export class ArticleController {
   ) {
     const result = await this.articleService.deleteOne(articleId, req.user.id);
 
-    if (result.affected) {
+    if (!result.affected) {
       return res.send({
         message: 'delete article failed',
       });

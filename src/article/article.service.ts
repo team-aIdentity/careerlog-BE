@@ -82,7 +82,7 @@ export class ArticleService {
   }
 
   async findOne(articleId: number) {
-    const article = this.articleRepository.findOne({
+    const article = await this.articleRepository.findOne({
       where: { id: articleId },
       relations: ['user', 'user.roles', 'user.roles.role'],
     });
