@@ -14,6 +14,10 @@ import { AdvertisementModule } from './advertisement/advertisement.module';
 import { CareerModule } from './career/career.module';
 import { AuthService } from './auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { ArticleModule } from './article/article.module';
+import { ArticleService } from './article/article.service';
+import { UserService } from './user/user.service';
+import { UserController } from './user/user.controller';
 
 @Module({
   imports: [
@@ -28,13 +32,23 @@ import { JwtService } from '@nestjs/jwt';
     UserModule,
     AdvertisementModule,
     CareerModule,
+    ArticleModule,
   ],
   controllers: [
     AppController,
     AuthController,
     ArticleController,
     ProductController,
+    ArticleController,
+    UserController,
   ],
-  providers: [AppService, PaymentsService, AuthService, JwtService],
+  providers: [
+    AppService,
+    PaymentsService,
+    UserService,
+    AuthService,
+    JwtService,
+    ArticleService,
+  ],
 })
 export class AppModule {}

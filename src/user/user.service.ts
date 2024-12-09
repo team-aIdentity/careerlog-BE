@@ -258,4 +258,20 @@ export class UserService {
       role: role,
     });
   }
+
+  async isAdmin(userId: number) {
+    const userOAuth: UserRole[] = await this.userRoleRepository.find({
+      where: {
+        user: { id: userId },
+      },
+      relations: ['role'],
+    });
+
+    let isAdmin: boolean = false;
+    userOAuth.forEach((item) => {
+      if (item.role.name == 'admin') isAdmin = true;
+    });
+
+    return isAdmin;
+  }
 }

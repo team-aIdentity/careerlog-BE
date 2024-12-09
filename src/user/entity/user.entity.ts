@@ -12,6 +12,7 @@ import { Career } from 'src/career/entity/career.entity';
 import { UserRole } from './userRole.entity';
 import { Academic } from './academic.entity';
 import { UserOAuth } from './userOAuth.entity';
+import { Article } from 'src/article/entity/article.entity';
 
 @Entity()
 export class User {
@@ -38,6 +39,9 @@ export class User {
 
   @OneToMany(() => UserOAuth, (userOAuth) => userOAuth.user)
   providers: UserOAuth[];
+
+  @OneToMany(() => Article, (article) => article.user)
+  articles: Article[];
 
   @CreateDateColumn()
   createAt: Date;
