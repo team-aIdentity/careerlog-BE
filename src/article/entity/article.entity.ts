@@ -9,6 +9,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { SavedArticle } from './savedArticle.entity';
+import { AritcleCategory } from './articleCategory.entity';
+import { Job } from 'src/job/entity/job.entity';
 
 @Entity()
 export class Article {
@@ -32,6 +34,16 @@ export class Article {
 
   @OneToMany(() => SavedArticle, (savedArticle) => savedArticle.article)
   userSaved: SavedArticle[];
+
+  @ManyToOne(
+    () => AritcleCategory,
+    (articleCategory) => articleCategory.articles,
+    { eager: true },
+  )
+  category: AritcleCategory;
+
+  @ManyToOne(() => Job, (job) => job.articles, { eager: true })
+  job: Job;
 
   @CreateDateColumn()
   createdAt: Date;

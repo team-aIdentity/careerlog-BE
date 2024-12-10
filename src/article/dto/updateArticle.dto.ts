@@ -12,4 +12,12 @@ export class UpdateArticleDto {
   @IsString()
   @IsOptional()
   thumbnail: string;
+
+  @IsString()
+  @IsOptional()
+  category: string;
+
+  @IsString()
+  @IsOptional()
+  job: string;
 }
