@@ -257,10 +257,12 @@ export class UserService {
     name: string,
     birthDate: string,
     phone: string,
+    isMarketing: boolean,
   ): Promise<User> {
     const createdUser = await this.userRepository.create({
       email,
       password,
+      isMarketing,
       profile: {
         name,
         birthDate,

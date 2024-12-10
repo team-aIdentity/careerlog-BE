@@ -48,16 +48,18 @@ export class AuthController {
       'credential',
     );
 
+    const cookieOptions = { httpOnly: true, path: '/' };
+
+    if (loginDto.isPermanant) {
+      if (loginDto.isMobile)
+        cookieOptions['maxAge'] = 3 * 28 * 24 * 60 * 60 * 1000;
+      else cookieOptions['maxAge'] = 14 * 24 * 60 * 60 * 1000;
+    }
+
     res.setHeader('Authorization', 'Bearer ' + [accessToken, refreshToken]);
-    res.cookie('accessToken', accessToken, {
-      httpOnly: true,
-    });
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-    });
-    res.cookie('deviceId', loginDto.deviceId, {
-      httpOnly: true,
-    });
+    res.cookie('accessToken', accessToken, cookieOptions);
+    res.cookie('refreshToken', refreshToken, cookieOptions);
+    res.cookie('deviceId', loginDto.deviceId, cookieOptions);
     return {
       message: 'login success',
       accessToken: accessToken,

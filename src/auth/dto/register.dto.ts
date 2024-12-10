@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsBoolean, IsString } from 'class-validator';
 
 export class RegisterDto {
   @IsString()
@@ -18,4 +18,7 @@ export class RegisterDto {
 
   @IsString()
   role: string;
+
+  @IsBoolean()
+  isMarketing: boolean;
 }
