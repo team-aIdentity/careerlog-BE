@@ -136,6 +136,8 @@ export class UserService {
       profile.expectSalary = updateProfileDto.expectSalary;
     if (updateProfileDto.isShareLink !== undefined)
       profile.isShareLink = updateProfileDto.isShareLink || false;
+    if (updateProfileDto.isNeedOffer !== undefined)
+      profile.isNeedOffer = updateProfileDto.isNeedOffer || false;
 
     await this.profileRepository.save(profile);
     return profile;

@@ -27,5 +27,9 @@ export class UpdateProfileDto {
 
   @IsOptional()
   @IsBoolean()
+  isNeedOffer?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
   isShareLink?: boolean;
 }

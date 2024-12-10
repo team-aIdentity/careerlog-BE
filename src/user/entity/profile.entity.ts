@@ -35,6 +35,9 @@ export class Profile {
   expectSalary: string;
 
   @Column({ default: false })
+  isNeedOffer: boolean;
+
+  @Column({ default: false })
   isShareLink: boolean;
 
   @ManyToOne(() => Culture, (culture) => culture.profiles)
