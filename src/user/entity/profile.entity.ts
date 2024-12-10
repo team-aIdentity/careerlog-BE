@@ -34,6 +34,9 @@ export class Profile {
   @Column({ nullable: true })
   expectSalary: string;
 
+  @Column({ default: false })
+  isShareLink: boolean;
+
   @ManyToOne(() => Culture, (culture) => culture.profiles)
   expectCulture: Culture;
 

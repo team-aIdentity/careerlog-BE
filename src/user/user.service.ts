@@ -134,6 +134,8 @@ export class UserService {
       profile.careerGoal = updateProfileDto.careerGoal;
     if (updateProfileDto.expectSalary !== undefined)
       profile.expectSalary = updateProfileDto.expectSalary;
+    if (updateProfileDto.isShareLink !== undefined)
+      profile.isShareLink = updateProfileDto.isShareLink || false;
 
     await this.profileRepository.save(profile);
     return profile;
