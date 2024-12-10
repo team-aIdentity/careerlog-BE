@@ -134,6 +134,10 @@ export class UserService {
       profile.careerGoal = updateProfileDto.careerGoal;
     if (updateProfileDto.expectSalary !== undefined)
       profile.expectSalary = updateProfileDto.expectSalary;
+    if (updateProfileDto.isShareLink !== undefined)
+      profile.isShareLink = updateProfileDto.isShareLink || false;
+    if (updateProfileDto.isNeedOffer !== undefined)
+      profile.isNeedOffer = updateProfileDto.isNeedOffer || false;
 
     await this.profileRepository.save(profile);
     return profile;
@@ -295,5 +299,12 @@ export class UserService {
     });
 
     return isAdmin;
+  }
+
+  async updateLastActiveDate(user: any) {
+    const existingUser: User = await this.findOne(user.id);
+    existingUser.lastActiveDate = new Date();
+    this.userRepository.save(existingUser);
+    return existingUser;
   }
 }
