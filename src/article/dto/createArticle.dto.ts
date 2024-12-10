@@ -10,4 +10,10 @@ export class CreateArticleDto {
   @IsString()
   @IsOptional()
   thumbnail: string;
+
+  @IsString()
+  category: string;
+
+  @IsString()
+  job: string;
 }

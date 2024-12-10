@@ -12,6 +12,9 @@ import { Role } from 'src/user/entity/role.entity';
 import { Profile } from 'src/user/entity/profile.entity';
 import { JwtService } from '@nestjs/jwt';
 import { SavedArticle } from './entity/savedArticle.entity';
+import { AritcleCategory } from './entity/articleCategory.entity';
+import { Job } from 'src/job/entity/job.entity';
+import { JobService } from 'src/job/job.service';
 
 @Module({
   imports: [
@@ -23,10 +26,12 @@ import { SavedArticle } from './entity/savedArticle.entity';
       Role,
       Profile,
       SavedArticle,
+      AritcleCategory,
+      Job,
     ]),
     UserModule,
   ],
-  providers: [ArticleService, UserService, JwtService],
+  providers: [ArticleService, UserService, JwtService, JobService],
   controllers: [ArticleController],
   exports: [ArticleModule, TypeOrmModule],
 })

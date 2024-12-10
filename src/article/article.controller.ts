@@ -16,6 +16,8 @@ import { ArticleService } from './article.service';
 import { CreateArticleDto } from './dto/createArticle.dto';
 import { UpdateArticleDto } from './dto/updateArticle.dto';
 import { Response } from 'express';
+import { CreateArticleCategoryDto } from './dto/createArticleCategory.dto';
+import { updateArticleCategoryDto } from './dto/updateArticleCategory.dto';
 
 @Controller('article')
 export class ArticleController {
@@ -36,38 +38,11 @@ export class ArticleController {
     @Query('pageSize') pageSize: number,
     @Query('page') page: number,
   ) {
-    console.log(pageSize);
     return await this.articleService.findAllWithUserId(
       pageSize,
       page,
       req.user.id,
     );
-  }
-
-  @Get(':id')
-  async getArticleById(
-    @Req() req: any,
-    @Param('id') articleId: number,
-    @Res() res: Response,
-  ) {
-    const article = await this.articleService.findOne(articleId);
-    const oldCookies = req.cookies['viewCount'];
-    if (oldCookies) {
-      if (!oldCookies.includes(`[${articleId}]`)) {
-        res.cookie('viewCount', oldCookies + `[${articleId}]`, {
-          httpOnly: true,
-          path: '/',
-        });
-        this.articleService.addViewCount(articleId);
-      }
-      return res.send({ article });
-    }
-    res.cookie('viewCount', `[${articleId}]`, {
-      httpOnly: true,
-      path: '/',
-    });
-    this.articleService.addViewCount(articleId);
-    return res.send({ article });
   }
 
   @Get('search/:keyword')
@@ -152,5 +127,85 @@ export class ArticleController {
     return res.send({
       message: 'article unsaved successfully',
     });
+  }
+
+  @Get('category/all')
+  async getAllArticleCategory() {
+    return await this.articleService.findAllCategories();
+  }
+
+  @Post('category')
+  @UseGuards(JwtAccessAuthGuard)
+  async createCategory(
+    @Req() req: any,
+    @Body() createArticleCategoryDto: CreateArticleCategoryDto,
+  ) {
+    const userId = req.user.id;
+    return await this.articleService.createCategory(
+      userId,
+      createArticleCategoryDto,
+    );
+  }
+
+  @Put('category/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  async updateCategory(
+    @Req() req: any,
+    @Body() updateArticleCategoryDto: updateArticleCategoryDto,
+    @Param('id') categoryId: number,
+  ) {
+    const userId = req.user.id;
+    return await this.articleService.updateCategory(
+      userId,
+      updateArticleCategoryDto,
+      categoryId,
+    );
+  }
+
+  @Delete('category/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  async deleteCategory(
+    @Req() req: any,
+    @Param('id') categoryId: number,
+    @Res() res: Response,
+  ) {
+    const userId = req.user.id;
+    const result = await this.articleService.deleteCategory(userId, categoryId);
+
+    if (!result.affected) {
+      return res.send({
+        message: 'delete article category failed',
+      });
+    }
+
+    return res.send({
+      message: 'article category delete successfully',
+    });
+  }
+
+  @Get(':id')
+  async getArticleById(
+    @Req() req: any,
+    @Param('id') articleId: number,
+    @Res() res: Response,
+  ) {
+    const article = await this.articleService.findOne(articleId);
+    const oldCookies = req.cookies['viewCount'];
+    if (oldCookies) {
+      if (!oldCookies.includes(`[${articleId}]`)) {
+        res.cookie('viewCount', oldCookies + `[${articleId}]`, {
+          httpOnly: true,
+          path: '/',
+        });
+        this.articleService.addViewCount(articleId);
+      }
+      return res.send({ article });
+    }
+    res.cookie('viewCount', `[${articleId}]`, {
+      httpOnly: true,
+      path: '/',
+    });
+    this.articleService.addViewCount(articleId);
+    return res.send({ article });
   }
 }

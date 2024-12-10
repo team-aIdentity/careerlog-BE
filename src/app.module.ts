@@ -20,6 +20,8 @@ import { UserService } from './user/user.service';
 import { UserController } from './user/user.controller';
 import { ProductModule } from './product/product.module';
 import { ProductService } from './product/product.service';
+import { JobModule } from './job/job.module';
+import { JobService } from './job/job.service';
 
 @Module({
   imports: [
@@ -36,6 +38,7 @@ import { ProductService } from './product/product.service';
     CareerModule,
     ArticleModule,
     ProductModule,
+    JobModule,
   ],
   controllers: [
     AppController,
@@ -54,6 +57,7 @@ import { ProductService } from './product/product.service';
     JwtService,
     ArticleService,
     ProductService,
+    JobService,
   ],
 })
 export class AppModule {}
