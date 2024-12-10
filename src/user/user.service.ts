@@ -296,4 +296,11 @@ export class UserService {
 
     return isAdmin;
   }
+
+  async updateLastActiveDate(user: any) {
+    const existingUser: User = await this.findOne(user.id);
+    existingUser.lastActiveDate = new Date();
+    this.userRepository.save(existingUser);
+    return existingUser;
+  }
 }
