@@ -19,7 +19,7 @@ export class Role {
   @Column({ nullable: true, length: 255 })
   description: string;
 
-  @OneToMany(() => UserRole, (userRole) => userRole.role)
+  @OneToMany(() => UserRole, (userRole) => userRole.role, { eager: true })
   userRoles: UserRole[];
 
   @CreateDateColumn()
