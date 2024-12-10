@@ -43,7 +43,7 @@ export class Profile {
   @ManyToOne(() => Culture, (culture) => culture.profiles)
   expectCulture: Culture;
 
-  @OneToOne(() => User, (user) => user.profile, { eager: true })
+  @OneToOne(() => User, (user) => user.profile)
   @JoinColumn()
   user: User;
 
