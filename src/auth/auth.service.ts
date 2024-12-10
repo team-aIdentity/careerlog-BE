@@ -58,6 +58,7 @@ export class AuthService {
         reqUser.name,
         reqUser.birthDate,
         reqUser.phone,
+        reqUser.isMarketing,
       );
       await this.userService.assignRole(user.id, 'user');
     }
@@ -135,7 +136,8 @@ export class AuthService {
    * @returns
    */
   async signUp(registerDto: RegisterDto): Promise<User> {
-    const { email, password, name, birthDate, phone, role } = registerDto;
+    const { email, password, name, birthDate, phone, role, isMarketing } =
+      registerDto;
     const existingUser = await this.userService.findOneByEmail(email);
 
     if (existingUser) {
@@ -149,6 +151,7 @@ export class AuthService {
       name,
       birthDate,
       phone,
+      isMarketing,
     );
     await this.userService.assignRole(user.id, role);
     const roleAssingedUser = await this.userService.findOne(user.id);

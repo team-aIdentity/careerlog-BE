@@ -20,6 +20,18 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
   ) {
     try {
       const { _json } = profile;
+      const service_terms = await (
+        await fetch(`	https://kapi.kakao.com/v2/user/service_terms`, {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        })
+      ).json();
+
+      const marketing_term = service_terms.service_terms.find(
+        (term) => term.tag === 'marketing_20241210',
+      );
       const user = {
         providerUserId: _json.id,
         provider: 'kakao',
@@ -27,6 +39,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
         name: _json.kakao_account.name,
         birthDate: _json.kakao_account.birthyear + _json.kakao_account.birthday,
         phone: _json.kakao_account.phone_number || null,
+        isMarketing: marketing_term ? true : false,
       };
       done(null, user);
     } catch (error) {

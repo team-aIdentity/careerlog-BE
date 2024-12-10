@@ -12,4 +12,7 @@ export class LoginDto {
 
   @IsBoolean()
   isMobile: boolean;
+
+  @IsBoolean()
+  isPermanant: boolean;
 }

@@ -30,6 +30,9 @@ export class User {
   @Column({ nullable: true, select: false })
   password: string;
 
+  @Column({ default: false })
+  isMarketing: boolean;
+
   @OneToOne(() => Profile, (profile) => profile.user, { cascade: true })
   profile: Profile;
 
