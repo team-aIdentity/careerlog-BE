@@ -7,6 +7,10 @@ export class UpdateProfileDto {
 
   @IsOptional()
   @IsString()
+  description: string;
+
+  @IsOptional()
+  @IsString()
   image: string;
 
   @IsOptional()
