@@ -20,6 +20,9 @@ export class Profile {
   name: string;
 
   @Column({ nullable: true })
+  description: string;
+
+  @Column({ nullable: true })
   image: string;
 
   @Column({ nullable: true })

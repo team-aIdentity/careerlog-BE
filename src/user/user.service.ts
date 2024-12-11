@@ -124,6 +124,8 @@ export class UserService {
 
     if (updateProfileDto.name !== undefined)
       profile.name = updateProfileDto.name;
+    if (updateProfileDto.description !== undefined)
+      profile.description = updateProfileDto.description;
     if (updateProfileDto.image !== undefined)
       profile.image = updateProfileDto.image;
     if (updateProfileDto.phone !== undefined)

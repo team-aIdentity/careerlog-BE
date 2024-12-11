@@ -75,6 +75,7 @@ export class ProductService {
     const product = await this.productRepository.create({
       title: createProductDto.title,
       content: createProductDto.content,
+      description: createProductDto.description,
       thumbnail: createProductDto.thumbnail || null,
       price: createProductDto.price,
       detailImage: createProductDto.detailImage,
@@ -164,6 +165,9 @@ export class ProductService {
     const updatedFields: Partial<Product> = {
       ...(updateProductDto.title && { title: updateProductDto.title }),
       ...(updateProductDto.content && { content: updateProductDto.content }),
+      ...(updateProductDto.description && {
+        content: updateProductDto.description,
+      }),
       ...(updateProductDto.thumbnail && {
         thumbnail: updateProductDto.thumbnail,
       }),
