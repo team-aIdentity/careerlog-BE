@@ -12,6 +12,12 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  app.enableCors({
+    origin: ['http://localhost:5173', process.env.CORS_URL],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+    allowedHeaders: 'Content-Type, Accept, Authorization',
+  });
   app.use(cookieParser());
   await app.listen(process.env.PORT ?? 3000);
 }
