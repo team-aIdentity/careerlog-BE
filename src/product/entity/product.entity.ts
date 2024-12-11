@@ -10,6 +10,9 @@ import {
 } from 'typeorm';
 import { SavedProduct } from './savedProduct.entity';
 import { Cart } from './cart.entity';
+import { ProductCategory } from './productCategory.entity';
+import { JobChangeStage } from 'src/job-change-stage/entity/jobChangeStage.entity';
+import { Job } from 'src/job/entity/job.entity';
 
 @Entity()
 export class Product {
@@ -45,6 +48,23 @@ export class Product {
 
   @OneToMany(() => Cart, (cart) => cart.product)
   cart: Cart[];
+
+  @ManyToOne(
+    () => ProductCategory,
+    (productCategory) => productCategory.products,
+    { eager: true },
+  )
+  category: ProductCategory;
+
+  @ManyToOne(
+    () => JobChangeStage,
+    (jobChangeStage) => jobChangeStage.products,
+    { eager: true },
+  )
+  jobChangeStage: JobChangeStage;
+
+  @ManyToOne(() => Job, (job) => job.products, { eager: true })
+  job: Job;
 
   @CreateDateColumn()
   createdAt: Date;

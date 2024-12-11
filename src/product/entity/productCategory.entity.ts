@@ -1,28 +1,22 @@
-import { Article } from 'src/article/entity/article.entity';
-import { Product } from 'src/product/entity/product.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
-  Unique,
   UpdateDateColumn,
 } from 'typeorm';
+import { Product } from './product.entity';
 
 @Entity()
-@Unique(['name'])
-export class Job {
+export class ProductCategory {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   name: string;
 
-  @OneToMany(() => Article, (article) => article.job)
-  articles: Article[];
-
-  @OneToMany(() => Product, (product) => product.job)
+  @OneToMany(() => Product, (product) => product.category)
   products: Product[];
 
   @CreateDateColumn()

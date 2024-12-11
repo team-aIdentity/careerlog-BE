@@ -17,7 +17,7 @@ import { CreateArticleDto } from './dto/createArticle.dto';
 import { UpdateArticleDto } from './dto/updateArticle.dto';
 import { Response } from 'express';
 import { CreateArticleCategoryDto } from './dto/createArticleCategory.dto';
-import { updateArticleCategoryDto } from './dto/updateArticleCategory.dto';
+import { UpdateArticleCategoryDto } from './dto/updateArticleCategory.dto';
 
 @Controller('article')
 export class ArticleController {
@@ -151,7 +151,7 @@ export class ArticleController {
   @UseGuards(JwtAccessAuthGuard)
   async updateCategory(
     @Req() req: any,
-    @Body() updateArticleCategoryDto: updateArticleCategoryDto,
+    @Body() updateArticleCategoryDto: UpdateArticleCategoryDto,
     @Param('id') categoryId: number,
   ) {
     const userId = req.user.id;

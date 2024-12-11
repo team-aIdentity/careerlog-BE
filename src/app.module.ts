@@ -22,6 +22,8 @@ import { ProductModule } from './product/product.module';
 import { ProductService } from './product/product.service';
 import { JobModule } from './job/job.module';
 import { JobService } from './job/job.service';
+import { JobChangeStageModule } from './job-change-stage/job-change-stage.module';
+import { JobChangeStageService } from './job-change-stage/job-change-stage.service';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { JobService } from './job/job.service';
     CareerModule,
     ArticleModule,
     ProductModule,
+    JobModule,
+    JobChangeStageModule,
     JobModule,
   ],
   controllers: [
@@ -58,6 +62,7 @@ import { JobService } from './job/job.service';
     ArticleService,
     ProductService,
     JobService,
+    JobChangeStageService,
   ],
 })
 export class AppModule {}

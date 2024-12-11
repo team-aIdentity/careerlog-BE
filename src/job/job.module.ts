@@ -12,16 +12,17 @@ import { Profile } from 'src/user/entity/profile.entity';
 import { UserModule } from 'src/user/user.module';
 import { ArticleModule } from 'src/article/article.module';
 import { Article } from 'src/article/entity/article.entity';
+import { Product } from 'src/product/entity/product.entity';
 
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([Job, User, UserOAuth, Profile, Article]),
+    TypeOrmModule.forFeature([Job, User, UserOAuth, Profile, Article, Product]),
     UserModule,
     ArticleModule,
   ],
   controllers: [JobController],
   providers: [JobService, UserService, JwtService],
-  exports: [JobModule],
+  exports: [TypeOrmModule, JobModule],
 })
 export class JobModule {}

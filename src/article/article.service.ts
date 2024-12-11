@@ -8,7 +8,7 @@ import { UserService } from 'src/user/user.service';
 import { SavedArticle } from './entity/savedArticle.entity';
 import { AritcleCategory } from './entity/articleCategory.entity';
 import { CreateArticleCategoryDto } from './dto/createArticleCategory.dto';
-import { updateArticleCategoryDto } from './dto/updateArticleCategory.dto';
+import { UpdateArticleCategoryDto } from './dto/updateArticleCategory.dto';
 import { JobService } from 'src/job/job.service';
 
 @Injectable()
@@ -247,7 +247,7 @@ export class ArticleService {
 
   async updateCategory(
     userId: number,
-    updateArticleCategoryDto: updateArticleCategoryDto,
+    updateArticleCategoryDto: UpdateArticleCategoryDto,
     categoryId: number,
   ) {
     const isAdmin = this.userService.isAdmin(userId);
