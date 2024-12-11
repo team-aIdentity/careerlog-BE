@@ -24,4 +24,16 @@ export class UpdateProductDto {
   @IsNumber()
   @IsOptional()
   discount: number;
+
+  @IsString()
+  @IsOptional()
+  category: string;
+
+  @IsString()
+  @IsOptional()
+  job: string;
+
+  @IsString()
+  @IsOptional()
+  jobChangeStage: string;
 }

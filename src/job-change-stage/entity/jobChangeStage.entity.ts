@@ -1,4 +1,3 @@
-import { Article } from 'src/article/entity/article.entity';
 import { Product } from 'src/product/entity/product.entity';
 import {
   Column,
@@ -6,23 +5,18 @@ import {
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
-  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
-@Unique(['name'])
-export class Job {
+export class JobChangeStage {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
   name: string;
 
-  @OneToMany(() => Article, (article) => article.job)
-  articles: Article[];
-
-  @OneToMany(() => Product, (product) => product.job)
+  @OneToMany(() => Product, (product) => product.jobChangeStage)
   products: Product[];
 
   @CreateDateColumn()

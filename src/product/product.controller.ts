@@ -16,6 +16,8 @@ import { Response } from 'express';
 import { JwtAccessAuthGuard } from 'src/auth/jwt/jwtAccessAuth.guard';
 import { CreateProductDto } from './dto/createProduct.dto';
 import { UpdateProductDto } from './dto/updateProduct.dto';
+import { CreateProductCategoryDto } from './dto/createProductCategory.dto';
+import { UpdateProductCategoryDto } from './dto/updateProductCategory.dto';
 
 @Controller('product')
 export class ProductController {
@@ -71,6 +73,60 @@ export class ProductController {
     @Query('page') page: number,
   ) {
     return await this.productService.getAfterCart(req.user.id, pageSize, page);
+  }
+
+  @Get('category/all')
+  async getAllArticleCategory() {
+    return await this.productService.findAllCategories();
+  }
+
+  @Post('category')
+  @UseGuards(JwtAccessAuthGuard)
+  async createCategory(
+    @Req() req: any,
+    @Body() createProductCategoryDto: CreateProductCategoryDto,
+  ) {
+    const userId = req.user.id;
+    return await this.productService.createCategory(
+      userId,
+      createProductCategoryDto,
+    );
+  }
+
+  @Put('category/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  async updateCategory(
+    @Req() req: any,
+    @Body() updateProductCategoryDto: UpdateProductCategoryDto,
+    @Param('id') categoryId: number,
+  ) {
+    const userId = req.user.id;
+    return await this.productService.updateCategory(
+      userId,
+      updateProductCategoryDto,
+      categoryId,
+    );
+  }
+
+  @Delete('category/:id')
+  @UseGuards(JwtAccessAuthGuard)
+  async deleteCategory(
+    @Req() req: any,
+    @Param('id') categoryId: number,
+    @Res() res: Response,
+  ) {
+    const userId = req.user.id;
+    const result = await this.productService.deleteCategory(userId, categoryId);
+
+    if (!result.affected) {
+      return res.send({
+        message: 'delete article category failed',
+      });
+    }
+
+    return res.send({
+      message: 'article category delete successfully',
+    });
   }
 
   @Get(':id')

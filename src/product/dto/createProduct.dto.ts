@@ -17,4 +17,13 @@ export class CreateProductDto {
   @IsString()
   @IsOptional()
   detailImage: string;
+
+  @IsString()
+  category: string;
+
+  @IsString()
+  job: string;
+
+  @IsString()
+  jobChangeStage: string;
 }

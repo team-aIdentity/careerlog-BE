@@ -7,11 +7,18 @@ import { CreateProductDto } from './dto/createProduct.dto';
 import { UpdateProductDto } from './dto/updateProduct.dto';
 import { SavedProduct } from './entity/savedProduct.entity';
 import { Cart } from './entity/cart.entity';
+import { ProductCategory } from './entity/productCategory.entity';
+import { CreateProductCategoryDto } from './dto/createProductCategory.dto';
+import { UpdateProductCategoryDto } from './dto/updateProductCategory.dto';
+import { JobService } from 'src/job/job.service';
+import { JobChangeStageService } from 'src/job-change-stage/job-change-stage.service';
 
 @Injectable()
 export class ProductService {
   constructor(
     private readonly userService: UserService,
+    private readonly jobService: JobService,
+    private readonly jobChangeStageService: JobChangeStageService,
 
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
@@ -19,13 +26,15 @@ export class ProductService {
     private savedProductRepository: Repository<SavedProduct>,
     @InjectRepository(Cart)
     private cartRepository: Repository<Cart>,
+    @InjectRepository(ProductCategory)
+    private productCategoryRepository: Repository<ProductCategory>,
   ) {}
 
   async findAll(take: number, page: number): Promise<any> {
     const [products, total] = await this.productRepository.findAndCount({
       take,
       skip: (page - 1) * take,
-      relations: ['user'],
+      relations: ['user', 'user.profile'],
     });
 
     return {
@@ -43,7 +52,7 @@ export class ProductService {
       where: { user: { id: userId } },
       take,
       skip: (page - 1) * take,
-      relations: ['user'],
+      relations: ['user', 'user.profile'],
     });
 
     return {
@@ -57,12 +66,35 @@ export class ProductService {
   }
 
   async createOne(createProductDto: CreateProductDto, userId: number) {
+    const category = await this.findOneCategory(createProductDto.category);
+    const job = await this.jobService.findOne(createProductDto.job);
+    const jobChangeStage = await this.jobChangeStageService.findOne(
+      createProductDto.jobChangeStage,
+    );
+
     const product = await this.productRepository.create({
-      ...createProductDto,
+      title: createProductDto.title,
+      content: createProductDto.content,
+      thumbnail: createProductDto.thumbnail || null,
+      price: createProductDto.price,
+      detailImage: createProductDto.detailImage,
       user: { id: userId },
+      category,
+      jobChangeStage,
+      job,
     });
     await this.productRepository.save(product);
     return product;
+  }
+
+  async findOneCategory(categoryName: string) {
+    const category = await this.productCategoryRepository.findOne({
+      where: { name: categoryName },
+    });
+
+    if (!category) throw new BadRequestException('category not found');
+
+    return category;
   }
 
   async findOne(productId: number) {
@@ -129,25 +161,53 @@ export class ProductService {
     if (product.user.id != userId || isAdmin)
       throw new BadRequestException('user is now the owner for this product');
 
-    if (updateProductDto.title !== undefined)
-      product.title = updateProductDto.title;
+    const updatedFields: Partial<Product> = {
+      ...(updateProductDto.title && { title: updateProductDto.title }),
+      ...(updateProductDto.content && { content: updateProductDto.content }),
+      ...(updateProductDto.thumbnail && {
+        thumbnail: updateProductDto.thumbnail,
+      }),
+      ...(updateProductDto.price && {
+        price: updateProductDto.price,
+      }),
+      ...(updateProductDto.detailImage && {
+        detailImage: updateProductDto.detailImage,
+      }),
+      ...(updateProductDto.discount && {
+        discount: updateProductDto.discount,
+      }),
+    };
 
-    if (updateProductDto.content !== undefined)
-      product.content = updateProductDto.content;
+    if (updateProductDto.category) {
+      const category = await this.productCategoryRepository.findOne({
+        where: { name: updateProductDto.category },
+      });
+      if (!category) {
+        throw new BadRequestException('Category not found');
+      }
+      updatedFields.category = category;
+    }
 
-    if (updateProductDto.thumbnail !== undefined)
-      product.thumbnail = updateProductDto.thumbnail;
+    if (updateProductDto.job) {
+      const job = await this.jobService.findOne(updateProductDto.job);
+      if (!job) {
+        throw new BadRequestException('Job not found');
+      }
+      updatedFields.job = job;
+    }
 
-    if (updateProductDto.price !== undefined)
-      product.price = updateProductDto.price || product.price;
+    if (updateProductDto.jobChangeStage) {
+      updatedFields.jobChangeStage = await this.jobChangeStageService.findOne(
+        updateProductDto.jobChangeStage,
+      );
+    }
 
-    if (updateProductDto.detailImage !== undefined)
-      product.detailImage = updateProductDto.detailImage;
+    // 객체 병합
+    Object.assign(product, updatedFields);
 
-    if (updateProductDto.discount !== undefined)
-      product.discount = updateProductDto.discount || null;
+    // 변경사항 저장
+    await this.productRepository.save(product);
 
-    this.productRepository.save(product);
     return product;
   }
 
@@ -243,5 +303,49 @@ export class ProductService {
       user: { id: userId },
       product: { id: productId },
     });
+  }
+
+  async findAllCategories() {
+    return await this.productCategoryRepository.find();
+  }
+
+  async createCategory(
+    userId: number,
+    createProductCategoryDto: CreateProductCategoryDto,
+  ) {
+    const isAdmin = this.userService.isAdmin(userId);
+    if (!isAdmin) throw new BadRequestException('user is not the admin');
+
+    const newCategory = this.productCategoryRepository.create({
+      name: createProductCategoryDto.name,
+    });
+    await this.productCategoryRepository.save(newCategory);
+    return newCategory;
+  }
+
+  async updateCategory(
+    userId: number,
+    updateProductCategoryDto: UpdateProductCategoryDto,
+    categoryId: number,
+  ) {
+    const isAdmin = this.userService.isAdmin(userId);
+    if (!isAdmin) throw new BadRequestException('user is not the admin');
+    const category = await this.productCategoryRepository.findOne({
+      where: { id: categoryId },
+    });
+    if (!category) throw new BadRequestException('category not found');
+
+    if (updateProductCategoryDto.name)
+      category.name = updateProductCategoryDto.name;
+
+    this.productCategoryRepository.save(category);
+    return category;
+  }
+
+  async deleteCategory(userId: number, categoryId: number) {
+    const isAdmin = this.userService.isAdmin(userId);
+    if (!isAdmin) throw new BadRequestException('user is not the admin');
+
+    return await this.productCategoryRepository.delete({ id: categoryId });
   }
 }
