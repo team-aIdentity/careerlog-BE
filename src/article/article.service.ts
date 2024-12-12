@@ -99,7 +99,7 @@ export class ArticleService {
     const article = await this.findOne(articleId);
     const isAdmin = await this.userService.isAdmin(userId);
 
-    if (article.user.id != userId || isAdmin)
+    if (article.user.id != userId || !isAdmin)
       throw new BadRequestException('user is now the owner for this article');
 
     const updatedFields: Partial<Article> = {
@@ -175,7 +175,7 @@ export class ArticleService {
     const article = await this.findOne(articleId);
     const isAdmin = await this.userService.isAdmin(userId);
 
-    if (article.user.id != userId || isAdmin)
+    if (article.user.id != userId || !isAdmin)
       throw new BadRequestException('user is now the owner for this article');
 
     return await this.articleRepository.delete({ id: articleId });
