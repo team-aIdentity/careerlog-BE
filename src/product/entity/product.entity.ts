@@ -43,8 +43,11 @@ export class Product {
   @Column({ default: 0 })
   viewCount: number;
 
-  @Column({ select: false, nullable: false })
+  @Column({ select: false, nullable: true })
   productLink: string;
+
+  @Column({ select: false, nullable: true })
+  productGeneralLink: string;
 
   @ManyToOne(() => User, (user) => user.products)
   user: User;

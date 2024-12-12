@@ -25,7 +25,12 @@ export class CreateProductDto {
   category: string;
 
   @IsString()
+  @IsOptional()
   productLink: string;
+
+  @IsString()
+  @IsOptional()
+  productGeneralLink: string;
 
   @IsString()
   job: string;
