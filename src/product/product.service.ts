@@ -135,7 +135,7 @@ export class ProductService {
     const product = await this.findOne(productId);
     const isAdmin = await this.userService.isAdmin(userId);
 
-    if (product.user.id != userId || isAdmin)
+    if (product.user.id != userId || !isAdmin)
       throw new BadRequestException('user is now the owner for this product');
 
     return await this.productRepository.delete({ id: productId });
@@ -160,7 +160,7 @@ export class ProductService {
     const product = await this.findOne(productId);
     const isAdmin = await this.userService.isAdmin(userId);
 
-    if (product.user.id != userId || isAdmin)
+    if (product.user.id != userId || !isAdmin)
       throw new BadRequestException('user is now the owner for this product');
 
     const updatedFields: Partial<Product> = {
