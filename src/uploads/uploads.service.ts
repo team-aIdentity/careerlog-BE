@@ -1,5 +1,5 @@
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -47,5 +47,54 @@ export class UploadsService {
     await this.s3Client.send(command);
 
     return `https://s3.${process.env.AWS_REGION}.amazonaws.com/${process.env.AWS_S3_BUCKET_NAME}/${fileName}`;
+  }
+
+  async fileUpload(file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No file provided.');
+    }
+
+    const allowedMimeTypes = {
+      'application/pdf': 'pdf',
+      'application/haansoft-hwp': 'hwp',
+      'application/vnd.ms-excel': 'xls',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+        'xlsx',
+    };
+
+    const fileExtension = allowedMimeTypes[file.mimetype];
+    if (!fileExtension) {
+      throw new BadRequestException('Unsupported file type.');
+    }
+
+    const fileName = `${uuidv4()}.${fileExtension}`;
+    const fileUrl = await this.uploadToS3(fileName, file, file.mimetype);
+
+    return { fileUrl };
+  }
+
+  private async uploadToS3(
+    fileName: string,
+    file: Express.Multer.File,
+    mimeType: string,
+  ) {
+    const bucketName = this.configService.get<string>('AWS_S3_BUCKET_NAME');
+    const region = this.configService.get<string>('AWS_REGION');
+
+    const command = new PutObjectCommand({
+      Bucket: bucketName,
+      Key: fileName,
+      Body: file.buffer,
+      ACL: 'public-read',
+      ContentType: mimeType,
+    });
+
+    try {
+      await this.s3Client.send(command);
+
+      return `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
+    } catch (error) {
+      throw new Error(`Failed to upload file to S3: ${error.message}`);
+    }
   }
 }
