@@ -79,6 +79,7 @@ export class ProductService {
       thumbnail: createProductDto.thumbnail || null,
       price: createProductDto.price,
       detailImage: createProductDto.detailImage,
+      productLink: createProductDto.productLink,
       user: { id: userId },
       category,
       jobChangeStage,
@@ -170,6 +171,9 @@ export class ProductService {
       }),
       ...(updateProductDto.thumbnail && {
         thumbnail: updateProductDto.thumbnail,
+      }),
+      ...(updateProductDto.productLink && {
+        productLink: updateProductDto.productLink,
       }),
       ...(updateProductDto.price && {
         price: updateProductDto.price,

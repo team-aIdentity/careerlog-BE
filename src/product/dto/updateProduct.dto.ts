@@ -35,6 +35,10 @@ export class UpdateProductDto {
 
   @IsString()
   @IsOptional()
+  productLink: string;
+
+  @IsString()
+  @IsOptional()
   job: string;
 
   @IsString()
