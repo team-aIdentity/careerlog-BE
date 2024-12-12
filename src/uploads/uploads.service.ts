@@ -19,34 +19,50 @@ export class UploadsService {
   }
 
   async imageUpload(file: Express.Multer.File) {
-    const imageName = `image-${uuidv4()}`;
-    const ext = file.originalname.split('.').pop();
+    if (!file) {
+      throw new BadRequestException('No file provided.');
+    }
 
-    const imageUrl = await this.imageUploadToS3(
-      `${imageName}.${ext}`,
-      file,
-      ext,
-    );
+    const allowedMimeTypes = [
+      'image/png',
+      'image/jpeg',
+      'image/jpg',
+      'image/svg+xml',
+    ];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      throw new BadRequestException('Unsupported file type.');
+    }
+
+    const ext = file.originalname.split('.').pop();
+    const imageName = `image-${uuidv4()}.${ext}`;
+    const imageUrl = await this.imageUploadToS3(imageName, file, file.mimetype);
 
     return { imageUrl };
   }
 
-  async imageUploadToS3(
+  private async imageUploadToS3(
     fileName: string,
     file: Express.Multer.File,
-    ext: string,
+    mimeType: string,
   ) {
+    const bucketName = this.configService.get<string>('AWS_S3_BUCKET_NAME');
+    const region = this.configService.get<string>('AWS_REGION');
+
     const command = new PutObjectCommand({
-      Bucket: this.configService.get('AWS_S3_BUCKET_NAME'),
+      Bucket: bucketName,
       Key: fileName,
       Body: file.buffer,
       ACL: 'public-read',
-      ContentType: `image/${ext}`,
+      ContentType: mimeType,
     });
 
-    await this.s3Client.send(command);
+    try {
+      await this.s3Client.send(command);
 
-    return `https://s3.${process.env.AWS_REGION}.amazonaws.com/${process.env.AWS_S3_BUCKET_NAME}/${fileName}`;
+      return `https://${bucketName}.s3.${region}.amazonaws.com/${fileName}`;
+    } catch (error) {
+      throw new Error(`Failed to upload image to S3: ${error.message}`);
+    }
   }
 
   async fileUpload(file: Express.Multer.File) {
