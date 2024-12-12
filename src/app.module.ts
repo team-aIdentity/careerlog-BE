@@ -24,6 +24,7 @@ import { JobModule } from './job/job.module';
 import { JobService } from './job/job.service';
 import { JobChangeStageModule } from './job-change-stage/job-change-stage.module';
 import { JobChangeStageService } from './job-change-stage/job-change-stage.service';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { JobChangeStageService } from './job-change-stage/job-change-stage.servi
     JobModule,
     JobChangeStageModule,
     JobModule,
+    UploadsModule,
   ],
   controllers: [
     AppController,
