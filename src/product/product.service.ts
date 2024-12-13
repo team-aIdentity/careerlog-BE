@@ -168,7 +168,7 @@ export class ProductService {
       ...(updateProductDto.title && { title: updateProductDto.title }),
       ...(updateProductDto.content && { content: updateProductDto.content }),
       ...(updateProductDto.description && {
-        content: updateProductDto.description,
+        description: updateProductDto.description,
       }),
       ...(updateProductDto.thumbnail && {
         thumbnail: updateProductDto.thumbnail,
