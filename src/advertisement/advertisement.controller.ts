@@ -27,9 +27,7 @@ export class AdvertisementController {
   ) {}
 
   @Get('/all')
-  async getAdAll(@Req() req: any) {
-    const isAdmin = await this.userService.isAdmin(req.user.id);
-    if (!isAdmin) throw new UnauthorizedException('user is not admin');
+  async getAdAll() {
     return await this.advertisementService.findAll();
   }
 
