@@ -25,6 +25,7 @@ import { JobService } from './job/job.service';
 import { JobChangeStageModule } from './job-change-stage/job-change-stage.module';
 import { JobChangeStageService } from './job-change-stage/job-change-stage.service';
 import { UploadsModule } from './uploads/uploads.module';
+import { PaymentsController } from './payments/payments.controller';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { UploadsModule } from './uploads/uploads.module';
     ArticleController,
     UserController,
     ProductController,
+    PaymentsController,
   ],
   providers: [
     AppService,
