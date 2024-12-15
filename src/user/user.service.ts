@@ -36,7 +36,19 @@ export class UserService {
     const [users, total] = await this.userRepository.findAndCount({
       take,
       skip: (page - 1) * take,
-      relations: ['profile', 'userRoles', 'providers'],
+      relations: [
+        'profile',
+        'userRoles',
+        'userRoles.role',
+        'providers',
+        'providers.provider',
+        'products',
+        'articles',
+        'savedArticles',
+        'savedProducts',
+        'careers',
+        'academics',
+      ],
     });
 
     return {
@@ -55,11 +67,15 @@ export class UserService {
       relations: [
         'profile',
         'userRoles',
+        'userRoles.role',
         'providers',
-        'careers',
-        'academics',
+        'providers.provider',
+        'products',
         'articles',
         'savedArticles',
+        'savedProducts',
+        'careers',
+        'academics',
       ],
     });
   }
@@ -79,6 +95,8 @@ export class UserService {
       .leftJoinAndSelect('user.academics', 'academics')
       .leftJoinAndSelect('user.articles', 'articles')
       .leftJoinAndSelect('user.savedArticles', 'savedArticles')
+      .leftJoinAndSelect('user.products', 'products')
+      .leftJoinAndSelect('user.savedProducts', 'savedProducts')
       .where('user.email = :email', { email });
 
     if (needPwd) {
