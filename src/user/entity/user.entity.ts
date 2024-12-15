@@ -57,12 +57,10 @@ export class User {
   @OneToMany(() => SavedArticle, (savedArticle) => savedArticle.user)
   savedArticles: SavedArticle[];
 
-  @OneToMany(() => Product, (product) => product.user, { eager: true })
+  @OneToMany(() => Product, (product) => product.user)
   products: Product[];
 
-  @OneToMany(() => SavedProduct, (savedProduct) => savedProduct.user, {
-    eager: true,
-  })
+  @OneToMany(() => SavedProduct, (savedProduct) => savedProduct.user)
   savedProducts: SavedProduct[];
 
   @OneToMany(() => Cart, (cart) => cart.user)

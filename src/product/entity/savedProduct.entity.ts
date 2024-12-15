@@ -18,7 +18,7 @@ export class SavedProduct {
   @ManyToOne(() => User, (user) => user.savedProducts)
   user: User;
 
-  @ManyToOne(() => Product, (product) => product.userSaved, { eager: true })
+  @ManyToOne(() => Product, (product) => product.userSaved)
   product: Product;
 
   @CreateDateColumn()

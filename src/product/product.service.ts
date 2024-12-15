@@ -103,7 +103,7 @@ export class ProductService {
   async findOne(productId: number) {
     const product = await this.productRepository.findOne({
       where: { id: productId },
-      relations: ['user', 'user.userRoles', 'user.userRoles.role'],
+      relations: ['user', 'user.profile'],
     });
 
     if (!product) {
@@ -359,5 +359,43 @@ export class ProductService {
     if (!isAdmin) throw new BadRequestException('user is not the admin');
 
     return await this.productCategoryRepository.delete({ id: categoryId });
+  }
+
+  async findAllSavedProduct(userId: number, take: number, page: number) {
+    const [savedProducts, total] =
+      await this.savedProductRepository.findAndCount({
+        where: {
+          user: { id: userId },
+        },
+        take,
+        skip: (page - 1) * take,
+        relations: ['user', 'product'],
+      });
+
+    return {
+      data: savedProducts,
+      meta: {
+        total,
+        page,
+        last_page: Math.ceil(total / take),
+      },
+    };
+  }
+
+  async isProductSavedByUser(
+    userId: number,
+    productId: number,
+  ): Promise<boolean> {
+    const savedProduct = await this.savedProductRepository.findOne({
+      where: { user: { id: userId }, product: { id: productId } },
+    });
+    console.log(!!savedProduct);
+    return !!savedProduct;
+  }
+
+  async getSavedUserCount(productId: number): Promise<number> {
+    return await this.savedProductRepository.count({
+      where: { product: { id: productId } },
+    });
   }
 }

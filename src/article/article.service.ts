@@ -272,4 +272,20 @@ export class ArticleService {
 
     return await this.articleCategoryRepository.delete({ id: categoryId });
   }
+
+  async isArticleSavedByUser(
+    userId: number,
+    articleId: number,
+  ): Promise<boolean> {
+    const savedArticle = await this.savedArticleRepository.findOne({
+      where: { user: { id: userId }, article: { id: articleId } },
+    });
+    return !!savedArticle;
+  }
+
+  async getSavedUserCount(articleId: number): Promise<number> {
+    return await this.savedArticleRepository.count({
+      where: { article: { id: articleId } },
+    });
+  }
 }

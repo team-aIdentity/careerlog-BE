@@ -18,17 +18,32 @@ import { UpdateArticleDto } from './dto/updateArticle.dto';
 import { Response } from 'express';
 import { CreateArticleCategoryDto } from './dto/createArticleCategory.dto';
 import { UpdateArticleCategoryDto } from './dto/updateArticleCategory.dto';
+import { JwtAccessAuthGuard2 } from 'src/auth/jwt/jwtAccessAuth2.guard';
 
 @Controller('article')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
   @Get('all')
+  @UseGuards(JwtAccessAuthGuard2)
   async getAllArticles(
+    @Req() req: any,
     @Query('pageSize') pageSize: number,
     @Query('page') page: number,
   ) {
-    return await this.articleService.findAll(pageSize, page);
+    const articles = await this.articleService.findAll(pageSize, page);
+    if (req.user) {
+      for (const article of articles.data) {
+        article.isSaved = await this.articleService.isArticleSavedByUser(
+          req.user.id,
+          article.id,
+        );
+        article.savedUserCount = await this.articleService.getSavedUserCount(
+          article.id,
+        );
+      }
+    }
+    return articles;
   }
 
   @Get('my')
@@ -184,12 +199,21 @@ export class ArticleController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAccessAuthGuard2)
   async getArticleById(
     @Req() req: any,
     @Param('id') articleId: number,
     @Res() res: Response,
   ) {
-    const article = await this.articleService.findOne(articleId);
+    const article: any = await this.articleService.findOne(articleId);
+    article.savedUserCount =
+      await this.articleService.getSavedUserCount(articleId);
+    if (req.user) {
+      article.isSaved = await this.articleService.isArticleSavedByUser(
+        req.user.id,
+        articleId,
+      );
+    }
     const oldCookies = req.cookies['viewCount'];
     if (oldCookies) {
       if (!oldCookies.includes(`[${articleId}]`)) {

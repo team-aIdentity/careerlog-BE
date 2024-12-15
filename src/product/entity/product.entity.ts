@@ -61,18 +61,13 @@ export class Product {
   @ManyToOne(
     () => ProductCategory,
     (productCategory) => productCategory.products,
-    { eager: true },
   )
   category: ProductCategory;
 
-  @ManyToOne(
-    () => JobChangeStage,
-    (jobChangeStage) => jobChangeStage.products,
-    { eager: true },
-  )
+  @ManyToOne(() => JobChangeStage, (jobChangeStage) => jobChangeStage.products)
   jobChangeStage: JobChangeStage;
 
-  @ManyToOne(() => Job, (job) => job.products, { eager: true })
+  @ManyToOne(() => Job, (job) => job.products)
   job: Job;
 
   @CreateDateColumn()
