@@ -34,7 +34,7 @@ export class ProductService {
     const [products, total] = await this.productRepository.findAndCount({
       take,
       skip: (page - 1) * take,
-      relations: ['user', 'user.profile'],
+      relations: ['user', 'user.profile', 'category', 'jobChangeStage', 'job'],
     });
 
     return {
@@ -52,7 +52,7 @@ export class ProductService {
       where: { user: { id: userId } },
       take,
       skip: (page - 1) * take,
-      relations: ['user', 'user.profile'],
+      relations: ['user', 'user.profile', 'category', 'jobChangeStage', 'job'],
     });
 
     return {
@@ -103,7 +103,7 @@ export class ProductService {
   async findOne(productId: number) {
     const product = await this.productRepository.findOne({
       where: { id: productId },
-      relations: ['user', 'user.profile'],
+      relations: ['user', 'user.profile', 'category', 'jobChangeStage', 'job'],
     });
 
     if (!product) {
