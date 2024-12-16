@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 import { Product } from './entity/product.entity';
 import { Repository } from 'typeorm';
@@ -15,6 +15,8 @@ import { JobChangeStageService } from 'src/job-change-stage/job-change-stage.ser
 
 @Injectable()
 export class ProductService {
+  private readonly logger = new Logger(ProductService.name);
+
   constructor(
     private readonly userService: UserService,
     private readonly jobService: JobService,
@@ -31,11 +33,13 @@ export class ProductService {
   ) {}
 
   async findAll(take: number, page: number): Promise<any> {
+    this.logger.log(`Finding all products with take: ${take}, page: ${page}`);
     const [products, total] = await this.productRepository.findAndCount({
       take,
       skip: (page - 1) * take,
       relations: ['user', 'user.profile', 'category', 'jobChangeStage', 'job'],
     });
+    this.logger.log(`Found ${total} products`);
 
     return {
       data: products,
@@ -48,12 +52,16 @@ export class ProductService {
   }
 
   async findAllWithUserId(take: number, page: number, userId): Promise<any> {
+    this.logger.log(
+      `Finding all products for userId: ${userId} with take: ${take}, page: ${page}`,
+    );
     const [products, total] = await this.productRepository.findAndCount({
       where: { user: { id: userId } },
       take,
       skip: (page - 1) * take,
       relations: ['user', 'user.profile', 'category', 'jobChangeStage', 'job'],
     });
+    this.logger.log(`Found ${total} products for userId: ${userId}`);
 
     return {
       data: products,
@@ -66,6 +74,9 @@ export class ProductService {
   }
 
   async createOne(createProductDto: CreateProductDto, userId: number) {
+    this.logger.log(
+      `Creating product for userId: ${userId} with data: ${JSON.stringify(createProductDto)}`,
+    );
     const category = await this.findOneCategory(createProductDto.category);
     const job = await this.jobService.findOne(createProductDto.job);
     const jobChangeStage = await this.jobChangeStageService.findOne(
@@ -87,26 +98,33 @@ export class ProductService {
       job,
     });
     await this.productRepository.save(product);
+    this.logger.log(`Product created with ID: ${product.id}`);
     return product;
   }
 
   async findOneCategory(categoryName: string) {
+    this.logger.log(`Finding category with name: ${categoryName}`);
     const category = await this.productCategoryRepository.findOne({
       where: { name: categoryName },
     });
 
-    if (!category) throw new BadRequestException('category not found');
+    if (!category) {
+      this.logger.error('Category not found');
+      throw new BadRequestException('category not found');
+    }
 
     return category;
   }
 
   async findOne(productId: number) {
+    this.logger.log(`Finding product with ID: ${productId}`);
     const product = await this.productRepository.findOne({
       where: { id: productId },
       relations: ['user', 'user.profile', 'category', 'jobChangeStage', 'job'],
     });
 
     if (!product) {
+      this.logger.error('Product not found');
       throw new BadRequestException('there is no product with ID');
     }
 
@@ -114,7 +132,9 @@ export class ProductService {
   }
 
   async findWithKeyword(keyword: string) {
+    this.logger.log(`Finding products with keyword: ${keyword}`);
     if (!keyword || keyword.trim() === '') {
+      this.logger.error('Keyword must be provided');
       throw new BadRequestException('Keyword must be provided');
     }
 
@@ -126,6 +146,7 @@ export class ProductService {
       .getMany();
 
     if (products.length === 0) {
+      this.logger.error('No products found matching the keyword');
       throw new BadRequestException('No products found matching the keyword');
     }
 
@@ -133,16 +154,24 @@ export class ProductService {
   }
 
   async deleteOne(productId: number, userId: number) {
+    this.logger.log(
+      `Deleting product with ID: ${productId} for userId: ${userId}`,
+    );
     const product = await this.findOne(productId);
     const isAdmin = await this.userService.isAdmin(userId);
 
-    if (product.user.id != userId || !isAdmin)
+    if (product.user.id != userId || !isAdmin) {
+      this.logger.error('User is not the owner or not an admin');
       throw new BadRequestException('user is now the owner for this product');
+    }
 
-    return await this.productRepository.delete({ id: productId });
+    const result = await this.productRepository.delete({ id: productId });
+    this.logger.log(`Product with ID: ${productId} deleted`);
+    return result;
   }
 
   async addViewCount(productId: number) {
+    this.logger.log(`Adding view count for product ID: ${productId}`);
     await this.productRepository
       .createQueryBuilder()
       .update()
@@ -151,6 +180,7 @@ export class ProductService {
       })
       .where('id = :id', { id: productId })
       .execute();
+    this.logger.log(`View count incremented for product ID: ${productId}`);
   }
 
   async updateProduct(
@@ -158,11 +188,16 @@ export class ProductService {
     productId: number,
     userId: number,
   ) {
+    this.logger.log(
+      `Updating product with ID: ${productId} for userId: ${userId} with data: ${JSON.stringify(updateProductDto)}`,
+    );
     const product = await this.findOne(productId);
     const isAdmin = await this.userService.isAdmin(userId);
 
-    if (product.user.id != userId || !isAdmin)
+    if (product.user.id != userId || !isAdmin) {
+      this.logger.error('User is not the owner or not an admin');
       throw new BadRequestException('user is now the owner for this product');
+    }
 
     const updatedFields: Partial<Product> = {
       ...(updateProductDto.title && { title: updateProductDto.title }),
@@ -195,6 +230,7 @@ export class ProductService {
         where: { name: updateProductDto.category },
       });
       if (!category) {
+        this.logger.error('Category not found');
         throw new BadRequestException('Category not found');
       }
       updatedFields.category = category;
@@ -203,6 +239,7 @@ export class ProductService {
     if (updateProductDto.job) {
       const job = await this.jobService.findOne(updateProductDto.job);
       if (!job) {
+        this.logger.error('Job not found');
         throw new BadRequestException('Job not found');
       }
       updatedFields.job = job;
@@ -219,17 +256,43 @@ export class ProductService {
 
     // 변경사항 저장
     await this.productRepository.save(product);
-
+    this.logger.log(`Product with ID: ${productId} updated`);
     return product;
   }
 
+  async getSavedProduct(userId: number, take: number, page: number) {
+    this.logger.log(
+      `Getting saved products for userId: ${userId} with take: ${take}, page: ${page}`,
+    );
+    const [savedProducts, total] =
+      await this.savedProductRepository.findAndCount({
+        where: { user: { id: userId } },
+        take,
+        skip: (page - 1) * take,
+        relations: ['user', 'product'],
+      });
+    this.logger.log(`Found ${total} saved products for userId: ${userId}`);
+    return {
+      data: savedProducts,
+      meta: {
+        total,
+        page,
+        last_page: Math.ceil(total / take),
+      },
+    };
+  }
+
   async saveProduct(userId: number, productId: number) {
+    this.logger.log(
+      `Saving product with ID: ${productId} for userId: ${userId}`,
+    );
     const savedProduct = await this.savedProductRepository.findOneBy({
       user: { id: userId },
       product: { id: productId },
     });
 
     if (savedProduct) {
+      this.logger.error('User already saved this product');
       throw new BadRequestException('user already saved this product');
     }
 
@@ -237,21 +300,35 @@ export class ProductService {
       user: { id: userId },
       product: { id: productId },
     });
+    this.logger.log(
+      `Product with ID: ${productId} saved for userId: ${userId}`,
+    );
   }
 
   async unsaveProduct(userId: number, productId: number) {
-    return await this.savedProductRepository.delete({
+    this.logger.log(
+      `Unsaving product with ID: ${productId} for userId: ${userId}`,
+    );
+    const result = await this.savedProductRepository.delete({
       user: { id: userId },
       product: { id: productId },
     });
+    this.logger.log(
+      `Product with ID: ${productId} unsaved for userId: ${userId}`,
+    );
+    return result;
   }
 
   async getAllCart(userId: number, take: number, page: number) {
+    this.logger.log(
+      `Getting all cart items for userId: ${userId} with take: ${take}, page: ${page}`,
+    );
     const [carts, total] = await this.cartRepository.findAndCount({
       where: { user: { id: userId } },
       take,
       skip: (page - 1) * take,
     });
+    this.logger.log(`Found ${total} cart items for userId: ${userId}`);
 
     return {
       data: carts,
@@ -264,11 +341,15 @@ export class ProductService {
   }
 
   async getBeforeCart(userId: number, take: number, page: number) {
+    this.logger.log(
+      `Getting before cart items for userId: ${userId} with take: ${take}, page: ${page}`,
+    );
     const [carts, total] = await this.cartRepository.findAndCount({
       where: { user: { id: userId }, isBought: false },
       take,
       skip: (page - 1) * take,
     });
+    this.logger.log(`Found ${total} before cart items for userId: ${userId}`);
 
     return {
       data: carts,
@@ -281,11 +362,15 @@ export class ProductService {
   }
 
   async getAfterCart(userId: number, take: number, page: number) {
+    this.logger.log(
+      `Getting after cart items for userId: ${userId} with take: ${take}, page: ${page}`,
+    );
     const [carts, total] = await this.cartRepository.findAndCount({
       where: { user: { id: userId }, isBought: true },
       take,
       skip: (page - 1) * take,
     });
+    this.logger.log(`Found ${total} after cart items for userId: ${userId}`);
 
     return {
       data: carts,
@@ -298,40 +383,64 @@ export class ProductService {
   }
 
   async addCart(productId: number, userId: number) {
+    this.logger.log(
+      `Adding product with ID: ${productId} to cart for userId: ${userId}`,
+    );
     await this.cartRepository.save({
       user: { id: userId },
       product: { id: productId },
       expiredIn: new Date().getTime() + 3 * 28 * 24 * 60 * 60 * 1000,
     });
 
-    return this.cartRepository.findOneBy({
+    const cartItem = await this.cartRepository.findOneBy({
       user: { id: userId },
       product: { id: productId },
     });
+    this.logger.log(
+      `Product with ID: ${productId} added to cart for userId: ${userId}`,
+    );
+    return cartItem;
   }
 
   async removeCart(productId: number, userId: number) {
-    return await this.cartRepository.delete({
+    this.logger.log(
+      `Removing product with ID: ${productId} from cart for userId: ${userId}`,
+    );
+    const result = await this.cartRepository.delete({
       user: { id: userId },
       product: { id: productId },
     });
+    this.logger.log(
+      `Product with ID: ${productId} removed from cart for userId: ${userId}`,
+    );
+    return result;
   }
 
   async findAllCategories() {
-    return await this.productCategoryRepository.find();
+    this.logger.log('Finding all categories');
+    const categories = await this.productCategoryRepository.find();
+    this.logger.log(`Found ${categories.length} categories`);
+    return categories;
   }
 
   async createCategory(
     userId: number,
     createProductCategoryDto: CreateProductCategoryDto,
   ) {
+    this.logger.log(
+      `Creating category for userId: ${userId} with data: ${JSON.stringify(createProductCategoryDto)}`,
+    );
     const isAdmin = this.userService.isAdmin(userId);
-    if (!isAdmin) throw new BadRequestException('user is not the admin');
+    if (!isAdmin) {
+      this.logger.error('User is not the admin');
+      throw new BadRequestException('user is not the admin');
+    }
 
     const newCategory = this.productCategoryRepository.create({
       name: createProductCategoryDto.name,
     });
     await this.productCategoryRepository.save(newCategory);
+    this.logger.log(`Category created with name: ${newCategory.name}`);
     return newCategory;
   }
 
@@ -340,28 +449,51 @@ export class ProductService {
     updateProductCategoryDto: UpdateProductCategoryDto,
     categoryId: number,
   ) {
+    this.logger.log(
+      `Updating category with ID: ${categoryId} for userId: ${userId} with data: ${JSON.stringify(updateProductCategoryDto)}`,
+    );
     const isAdmin = this.userService.isAdmin(userId);
-    if (!isAdmin) throw new BadRequestException('user is not the admin');
+    if (!isAdmin) {
+      this.logger.error('User is not the admin');
+      throw new BadRequestException('user is not the admin');
+    }
     const category = await this.productCategoryRepository.findOne({
       where: { id: categoryId },
     });
-    if (!category) throw new BadRequestException('category not found');
+    if (!category) {
+      this.logger.error('Category not found');
+      throw new BadRequestException('category not found');
+    }
 
     if (updateProductCategoryDto.name)
       category.name = updateProductCategoryDto.name;
 
-    this.productCategoryRepository.save(category);
+    await this.productCategoryRepository.save(category);
+    this.logger.log(`Category with ID: ${categoryId} updated`);
     return category;
   }
 
   async deleteCategory(userId: number, categoryId: number) {
+    this.logger.log(
+      `Deleting category with ID: ${categoryId} for userId: ${userId}`,
+    );
     const isAdmin = this.userService.isAdmin(userId);
-    if (!isAdmin) throw new BadRequestException('user is not the admin');
+    if (!isAdmin) {
+      this.logger.error('User is not the admin');
+      throw new BadRequestException('user is not the admin');
+    }
 
-    return await this.productCategoryRepository.delete({ id: categoryId });
+    const result = await this.productCategoryRepository.delete({
+      id: categoryId,
+    });
+    this.logger.log(`Category with ID: ${categoryId} deleted`);
+    return result;
   }
 
   async findAllSavedProduct(userId: number, take: number, page: number) {
+    this.logger.log(
+      `Finding all saved products for userId: ${userId} with take: ${take}, page: ${page}`,
+    );
     const [savedProducts, total] =
       await this.savedProductRepository.findAndCount({
         where: {
@@ -371,6 +503,7 @@ export class ProductService {
         skip: (page - 1) * take,
         relations: ['user', 'product'],
       });
+    this.logger.log(`Found ${total} saved products for userId: ${userId}`);
 
     return {
       data: savedProducts,
@@ -386,16 +519,24 @@ export class ProductService {
     userId: number,
     productId: number,
   ): Promise<boolean> {
+    this.logger.log(
+      `Checking if product with ID: ${productId} is saved by userId: ${userId}`,
+    );
     const savedProduct = await this.savedProductRepository.findOne({
       where: { user: { id: userId }, product: { id: productId } },
     });
-    console.log(!!savedProduct);
+    this.logger.log(
+      `Product with ID: ${productId} is ${savedProduct ? '' : 'not '}saved by userId: ${userId}`,
+    );
     return !!savedProduct;
   }
 
   async getSavedUserCount(productId: number): Promise<number> {
-    return await this.savedProductRepository.count({
+    this.logger.log(`Getting saved user count for product ID: ${productId}`);
+    const count = await this.savedProductRepository.count({
       where: { product: { id: productId } },
     });
+    this.logger.log(`Product with ID: ${productId} is saved by ${count} users`);
+    return count;
   }
 }

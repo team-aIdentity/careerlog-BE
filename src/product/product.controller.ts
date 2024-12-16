@@ -227,6 +227,20 @@ export class ProductController {
     });
   }
 
+  @Get('saved')
+  @UseGuards(JwtAccessAuthGuard)
+  async getSavedProduct(
+    @Req() req: any,
+    @Query('pageSize') pageSize: number,
+    @Query('page') page: number,
+  ) {
+    return await this.productService.getSavedProduct(
+      req.user.id,
+      pageSize,
+      page,
+    );
+  }
+
   @Post('save/:id')
   @UseGuards(JwtAccessAuthGuard)
   async saveProduct(
