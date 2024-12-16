@@ -230,14 +230,16 @@ export class ArticleService {
     const [savedArticles, total] =
       await this.savedArticleRepository.findAndCount({
         where: { user: { id: userId } },
-        relations: ['article'],
+        relations: ['article', 'article.user', 'article.user.profile'],
         take,
         skip: (page - 1) * take,
       });
 
-    this.logger.log(`Fetched ${savedArticles.length} saved articles`);
+    const articles = savedArticles.map((savedArticle) => savedArticle.article);
+
+    this.logger.log(`Fetched ${articles.length} saved articles`);
     return {
-      data: savedArticles,
+      data: articles,
       meta: {
         total,
         page,

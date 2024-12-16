@@ -271,9 +271,14 @@ export class ProductService {
         skip: (page - 1) * take,
         relations: ['user', 'product'],
       });
-    this.logger.log(`Found ${total} saved products for userId: ${userId}`);
+
+    const products = savedProducts.map((savedProduct) => savedProduct.product);
+
+    this.logger.log(
+      `Found ${products.length} saved products for userId: ${userId}`,
+    );
     return {
-      data: savedProducts,
+      data: products,
       meta: {
         total,
         page,
