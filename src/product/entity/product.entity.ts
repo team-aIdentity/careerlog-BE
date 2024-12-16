@@ -25,7 +25,7 @@ export class Product {
   @Column({ nullable: true })
   thumbnail: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   content: string;
 
   @Column({ nullable: true })
