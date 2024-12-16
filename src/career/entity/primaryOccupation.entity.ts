@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { SecondaryOccupation } from './secondaryOccupation,entity';
+import { SecondaryOccupation } from './secondaryOccupation.entity';
 
 @Entity()
 export class PrimaryOccupation {

@@ -1,4 +1,4 @@
-import { SecondaryOccupation } from 'src/career/entity/secondaryOccupation,entity';
+import { SecondaryOccupation } from 'src/career/entity/secondaryOccupation.entity';
 import { User } from 'src/user/entity/user.entity';
 import {
   Column,
@@ -17,6 +17,15 @@ export class Career {
 
   @Column({ nullable: false })
   company: string;
+
+  @Column({ nullable: false })
+  startAt: Date;
+
+  @Column({ nullable: true })
+  endAt: Date;
+
+  @Column({ nullable: true, type: 'int', default: null })
+  totalYear: number;
 
   @ManyToOne(
     () => SecondaryOccupation,
