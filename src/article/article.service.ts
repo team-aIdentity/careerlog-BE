@@ -223,6 +223,29 @@ export class ArticleService {
     this.logger.log(`View count incremented for article ID: ${articleId}`);
   }
 
+  async getSavedArticle(userId: number, take: number, page: number) {
+    this.logger.log(
+      `Fetching saved articles for user ID: ${userId} with pagination: take=${take}, page=${page}`,
+    );
+    const [savedArticles, total] =
+      await this.savedArticleRepository.findAndCount({
+        where: { user: { id: userId } },
+        relations: ['article'],
+        take,
+        skip: (page - 1) * take,
+      });
+
+    this.logger.log(`Fetched ${savedArticles.length} saved articles`);
+    return {
+      data: savedArticles,
+      meta: {
+        total,
+        page,
+        last_page: Math.ceil(total / take),
+      },
+    };
+  }
+
   async saveArticle(userId: number, articleId: number) {
     const user = await this.userService.findOne(userId);
     const article = await this.articleRepository.findOne({
