@@ -20,7 +20,7 @@ export class Advertisement {
   @Column()
   adNumber: number;
 
-  @Column()
+  @Column({ type: 'text' })
   memo: string;
 
   @Column()
