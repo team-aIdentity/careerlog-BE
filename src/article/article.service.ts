@@ -224,23 +224,32 @@ export class ArticleService {
   }
 
   async saveArticle(userId: number, articleId: number) {
-    this.logger.log(`Saving article ID: ${articleId} for user ID: ${userId}`);
-    const savedArticle = await this.savedArticleRepository.findOneBy({
-      user: { id: userId },
-      article: { id: articleId },
+    const user = await this.userService.findOne(userId);
+    const article = await this.articleRepository.findOne({
+      where: { id: articleId },
+    });
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (!article) {
+      throw new BadRequestException('Article not found');
+    }
+
+    const savedArticle = await this.savedArticleRepository.findOne({
+      where: { user: { id: userId }, article: { id: articleId } },
     });
 
     if (savedArticle) {
-      this.logger.warn(
-        `User ID: ${userId} already saved article ID: ${articleId}`,
-      );
       throw new BadRequestException('User already saved this article');
     }
 
     await this.savedArticleRepository.save({
-      user: { id: userId },
-      article: { id: articleId },
+      user: user,
+      article: article,
     });
+
     this.logger.log(`Article ID: ${articleId} saved for user ID: ${userId}`);
   }
 
