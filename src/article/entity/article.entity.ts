@@ -20,7 +20,7 @@ export class Article {
   @Column()
   title: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   content: string;
 
   @Column({ nullable: true })
