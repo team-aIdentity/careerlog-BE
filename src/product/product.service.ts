@@ -283,23 +283,30 @@ export class ProductService {
   }
 
   async saveProduct(userId: number, productId: number) {
-    this.logger.log(
-      `Saving product with ID: ${productId} for userId: ${userId}`,
-    );
-    const savedProduct = await this.savedProductRepository.findOneBy({
-      user: { id: userId },
-      product: { id: productId },
+    const user = await this.userService.findOne(userId);
+    const product = await this.findOne(productId);
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    if (!product) {
+      throw new BadRequestException('Product not found');
+    }
+
+    const savedProduct = await this.savedProductRepository.findOne({
+      where: { user: { id: userId }, product: { id: productId } },
     });
 
     if (savedProduct) {
-      this.logger.error('User already saved this product');
-      throw new BadRequestException('user already saved this product');
+      throw new BadRequestException('User already saved this product');
     }
 
     await this.savedProductRepository.save({
-      user: { id: userId },
-      product: { id: productId },
+      user,
+      product,
     });
+
     this.logger.log(
       `Product with ID: ${productId} saved for userId: ${userId}`,
     );
