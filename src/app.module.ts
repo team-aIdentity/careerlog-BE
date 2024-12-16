@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthController } from './auth/auth.controller';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ArticleController } from './article/article.controller';
@@ -12,7 +11,6 @@ import { typeORMConfig } from './config/typeorm.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AdvertisementModule } from './advertisement/advertisement.module';
 import { CareerModule } from './career/career.module';
-import { AuthService } from './auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { ArticleModule } from './article/article.module';
 import { ArticleService } from './article/article.service';
@@ -48,7 +46,6 @@ import { PaymentsController } from './payments/payments.controller';
   ],
   controllers: [
     AppController,
-    AuthController,
     ArticleController,
     ProductController,
     ArticleController,
@@ -60,7 +57,6 @@ import { PaymentsController } from './payments/payments.controller';
     AppService,
     PaymentsService,
     UserService,
-    AuthService,
     JwtService,
     ArticleService,
     ProductService,

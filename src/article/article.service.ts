@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Article } from './entity/article.entity';
 import { Repository } from 'typeorm';
@@ -13,6 +13,8 @@ import { JobService } from 'src/job/job.service';
 
 @Injectable()
 export class ArticleService {
+  private readonly logger = new Logger(ArticleService.name);
+
   constructor(
     private readonly userService: UserService,
     private readonly jobService: JobService,
@@ -26,12 +28,16 @@ export class ArticleService {
   ) {}
 
   async findAll(take: number, page: number): Promise<any> {
+    this.logger.log(
+      `Fetching all articles with pagination: take=${take}, page=${page}`,
+    );
     const [articles, total] = await this.articleRepository.findAndCount({
       take,
       skip: (page - 1) * take,
       relations: ['user', 'user.profile'],
     });
 
+    this.logger.log(`Fetched ${articles.length} articles`);
     return {
       data: articles,
       meta: {
@@ -43,6 +49,9 @@ export class ArticleService {
   }
 
   async findAllWithUserId(take: number, page: number, userId): Promise<any> {
+    this.logger.log(
+      `Fetching articles for user ID: ${userId} with pagination: take=${take}, page=${page}`,
+    );
     const [articles, total] = await this.articleRepository.findAndCount({
       where: { user: { id: userId } },
       take,
@@ -50,6 +59,9 @@ export class ArticleService {
       relations: ['user'],
     });
 
+    this.logger.log(
+      `Fetched ${articles.length} articles for user ID: ${userId}`,
+    );
     return {
       data: articles,
       meta: {
@@ -61,33 +73,32 @@ export class ArticleService {
   }
 
   async createOne(createArticleDto: CreateArticleDto, userId: number) {
-    // Category 찾기
+    this.logger.log(`Creating a new article for user ID: ${userId}`);
     const category = await this.articleCategoryRepository.findOne({
       where: { name: createArticleDto.category },
     });
     if (!category) {
+      this.logger.warn(`Category not found: ${createArticleDto.category}`);
       throw new BadRequestException('Category not found');
     }
 
-    // Job 찾기
     const job = await this.jobService.findOne(createArticleDto.job);
     if (!job) {
+      this.logger.warn(`Job not found: ${createArticleDto.job}`);
       throw new BadRequestException('Job not found');
     }
 
-    // Article 생성
     const article = this.articleRepository.create({
       title: createArticleDto.title,
       content: createArticleDto.content,
       thumbnail: createArticleDto.thumbnail,
-      user: { id: userId }, // User 엔터티 ID만 설정
-      category: category, // 찾은 Category 엔터티
-      job: job, // 찾은 Job 엔터티
+      user: { id: userId },
+      category: category,
+      job: job,
     });
 
-    // Article 저장
     await this.articleRepository.save(article);
-
+    this.logger.log(`Article created with ID: ${article.id}`);
     return article;
   }
 
@@ -96,11 +107,16 @@ export class ArticleService {
     articleId: number,
     userId: number,
   ) {
+    this.logger.log(`Updating article ID: ${articleId} for user ID: ${userId}`);
     const article = await this.findOne(articleId);
     const isAdmin = await this.userService.isAdmin(userId);
 
-    if (article.user.id != userId || !isAdmin)
-      throw new BadRequestException('user is now the owner for this article');
+    if (article.user.id != userId && !isAdmin) {
+      this.logger.warn(
+        `User ID: ${userId} is not the owner or admin for article ID: ${articleId}`,
+      );
+      throw new BadRequestException('User is not the owner for this article');
+    }
 
     const updatedFields: Partial<Article> = {
       ...(updateArticleDto.title && { title: updateArticleDto.title }),
@@ -108,15 +124,14 @@ export class ArticleService {
       ...(updateArticleDto.thumbnail && {
         thumbnail: updateArticleDto.thumbnail,
       }),
-      // ...(updateArticleDto.job && { job: updateArticleDto.job }),
     };
 
-    // Category 매핑
     if (updateArticleDto.category) {
       const category = await this.articleCategoryRepository.findOne({
         where: { name: updateArticleDto.category },
       });
       if (!category) {
+        this.logger.warn(`Category not found: ${updateArticleDto.category}`);
         throw new BadRequestException('Category not found');
       }
       updatedFields.category = category;
@@ -125,35 +140,38 @@ export class ArticleService {
     if (updateArticleDto.job) {
       const job = await this.jobService.findOne(updateArticleDto.job);
       if (!job) {
+        this.logger.warn(`Job not found: ${updateArticleDto.job}`);
         throw new BadRequestException('Job not found');
       }
       updatedFields.job = job;
     }
 
-    // 객체 병합
     Object.assign(article, updatedFields);
-
-    // 변경사항 저장
     await this.articleRepository.save(article);
-
+    this.logger.log(`Article updated with ID: ${article.id}`);
     return article;
   }
 
   async findOne(articleId: number) {
+    this.logger.log(`Fetching article with ID: ${articleId}`);
     const article = await this.articleRepository.findOne({
       where: { id: articleId },
       relations: ['user', 'user.userRoles', 'user.userRoles.role'],
     });
 
     if (!article) {
-      throw new BadRequestException('there is no article with ID');
+      this.logger.warn(`No article found with ID: ${articleId}`);
+      throw new BadRequestException('There is no article with ID');
     }
 
+    this.logger.log(`Article found with ID: ${articleId}`);
     return article;
   }
 
   async findWithKeyword(keyword: string) {
+    this.logger.log(`Searching articles with keyword: ${keyword}`);
     if (!keyword || keyword.trim() === '') {
+      this.logger.warn('Keyword must be provided');
       throw new BadRequestException('Keyword must be provided');
     }
 
@@ -165,23 +183,35 @@ export class ArticleService {
       .getMany();
 
     if (articles.length === 0) {
+      this.logger.warn(`No articles found matching the keyword: ${keyword}`);
       throw new BadRequestException('No articles found matching the keyword');
     }
 
+    this.logger.log(
+      `Found ${articles.length} articles matching the keyword: ${keyword}`,
+    );
     return articles;
   }
 
   async deleteOne(articleId: number, userId: number) {
+    this.logger.log(`Deleting article ID: ${articleId} for user ID: ${userId}`);
     const article = await this.findOne(articleId);
     const isAdmin = await this.userService.isAdmin(userId);
 
-    if (article.user.id != userId || !isAdmin)
-      throw new BadRequestException('user is now the owner for this article');
+    if (article.user.id != userId && !isAdmin) {
+      this.logger.warn(
+        `User ID: ${userId} is not the owner or admin for article ID: ${articleId}`,
+      );
+      throw new BadRequestException('User is not the owner for this article');
+    }
 
-    return await this.articleRepository.delete({ id: articleId });
+    const result = await this.articleRepository.delete({ id: articleId });
+    this.logger.log(`Article deleted with ID: ${articleId}`);
+    return result;
   }
 
   async addViewCount(articleId: number) {
+    this.logger.log(`Incrementing view count for article ID: ${articleId}`);
     await this.articleRepository
       .createQueryBuilder()
       .update()
@@ -190,32 +220,42 @@ export class ArticleService {
       })
       .where('id = :id', { id: articleId })
       .execute();
+    this.logger.log(`View count incremented for article ID: ${articleId}`);
   }
 
   async saveArticle(userId: number, articleId: number) {
+    this.logger.log(`Saving article ID: ${articleId} for user ID: ${userId}`);
     const savedArticle = await this.savedArticleRepository.findOneBy({
       user: { id: userId },
       article: { id: articleId },
     });
 
     if (savedArticle) {
-      throw new BadRequestException('user already saved this article');
+      this.logger.warn(
+        `User ID: ${userId} already saved article ID: ${articleId}`,
+      );
+      throw new BadRequestException('User already saved this article');
     }
 
     await this.savedArticleRepository.save({
       user: { id: userId },
       article: { id: articleId },
     });
+    this.logger.log(`Article ID: ${articleId} saved for user ID: ${userId}`);
   }
 
   async unsaveArticle(userId: number, articleId: number) {
-    return await this.savedArticleRepository.delete({
+    this.logger.log(`Unsaving article ID: ${articleId} for user ID: ${userId}`);
+    const result = await this.savedArticleRepository.delete({
       user: { id: userId },
       article: { id: articleId },
     });
+    this.logger.log(`Article ID: ${articleId} unsaved for user ID: ${userId}`);
+    return result;
   }
 
   async findAllCategories() {
+    this.logger.log('Fetching all article categories');
     const categories = await this.articleCategoryRepository.find();
 
     const groupedCategories = categories.reduce((result, category) => {
@@ -227,6 +267,7 @@ export class ArticleService {
       return result;
     }, {});
 
+    this.logger.log(`Fetched ${categories.length} categories`);
     return groupedCategories;
   }
 
@@ -234,14 +275,19 @@ export class ArticleService {
     userId: number,
     createArticleCategory: CreateArticleCategoryDto,
   ) {
-    const isAdmin = this.userService.isAdmin(userId);
-    if (!isAdmin) throw new BadRequestException('user is not the admin');
+    this.logger.log(`Creating a new category for user ID: ${userId}`);
+    const isAdmin = await this.userService.isAdmin(userId);
+    if (!isAdmin) {
+      this.logger.warn(`User ID: ${userId} is not an admin`);
+      throw new BadRequestException('User is not the admin');
+    }
 
     const newCategory = this.articleCategoryRepository.create({
       type: createArticleCategory.type,
       name: createArticleCategory.name,
     });
     await this.articleCategoryRepository.save(newCategory);
+    this.logger.log(`Category created with ID: ${newCategory.id}`);
     return newCategory;
   }
 
@@ -250,42 +296,72 @@ export class ArticleService {
     updateArticleCategoryDto: UpdateArticleCategoryDto,
     categoryId: number,
   ) {
-    const isAdmin = this.userService.isAdmin(userId);
-    if (!isAdmin) throw new BadRequestException('user is not the admin');
+    this.logger.log(
+      `Updating category ID: ${categoryId} for user ID: ${userId}`,
+    );
+    const isAdmin = await this.userService.isAdmin(userId);
+    if (!isAdmin) {
+      this.logger.warn(`User ID: ${userId} is not an admin`);
+      throw new BadRequestException('User is not the admin');
+    }
     const category = await this.articleCategoryRepository.findOne({
       where: { id: categoryId },
     });
-    if (!category) throw new BadRequestException('category not found');
+    if (!category) {
+      this.logger.warn(`Category not found with ID: ${categoryId}`);
+      throw new BadRequestException('Category not found');
+    }
 
     if (updateArticleCategoryDto.type)
       category.type = updateArticleCategoryDto.type;
     if (updateArticleCategoryDto.name)
       category.name = updateArticleCategoryDto.name;
 
-    this.articleCategoryRepository.save(category);
+    await this.articleCategoryRepository.save(category);
+    this.logger.log(`Category updated with ID: ${category.id}`);
     return category;
   }
 
   async deleteCategory(userId: number, categoryId: number) {
-    const isAdmin = this.userService.isAdmin(userId);
-    if (!isAdmin) throw new BadRequestException('user is not the admin');
+    this.logger.log(
+      `Deleting category ID: ${categoryId} for user ID: ${userId}`,
+    );
+    const isAdmin = await this.userService.isAdmin(userId);
+    if (!isAdmin) {
+      this.logger.warn(`User ID: ${userId} is not an admin`);
+      throw new BadRequestException('User is not the admin');
+    }
 
-    return await this.articleCategoryRepository.delete({ id: categoryId });
+    const result = await this.articleCategoryRepository.delete({
+      id: categoryId,
+    });
+    this.logger.log(`Category deleted with ID: ${categoryId}`);
+    return result;
   }
 
   async isArticleSavedByUser(
     userId: number,
     articleId: number,
   ): Promise<boolean> {
+    this.logger.log(
+      `Checking if article ID: ${articleId} is saved by user ID: ${userId}`,
+    );
     const savedArticle = await this.savedArticleRepository.findOne({
       where: { user: { id: userId }, article: { id: articleId } },
     });
-    return !!savedArticle;
+    const isSaved = !!savedArticle;
+    this.logger.log(
+      `Article ID: ${articleId} is ${isSaved ? '' : 'not '}saved by user ID: ${userId}`,
+    );
+    return isSaved;
   }
 
   async getSavedUserCount(articleId: number): Promise<number> {
-    return await this.savedArticleRepository.count({
+    this.logger.log(`Getting saved user count for article ID: ${articleId}`);
+    const count = await this.savedArticleRepository.count({
       where: { article: { id: articleId } },
     });
+    this.logger.log(`Article ID: ${articleId} is saved by ${count} users`);
+    return count;
   }
 }
