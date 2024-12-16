@@ -15,7 +15,7 @@ export class SavedArticle {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.savedArticles)
+  @ManyToOne(() => User, (user) => user.savedArticles, { nullable: false })
   user: User;
 
   @ManyToOne(() => Article, (article) => article.userSaved, { eager: true })
