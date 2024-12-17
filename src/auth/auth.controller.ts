@@ -86,6 +86,8 @@ export class AuthController {
       res.setHeader('Authorization', 'Bearer ' + newAccessToken);
       res.cookie('accessToken', newAccessToken, {
         httpOnly: true,
+        sameSite: 'none',
+        secure: false,
       });
       res.send({ newAccessToken });
     } catch (err) {

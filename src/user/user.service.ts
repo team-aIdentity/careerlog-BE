@@ -244,12 +244,13 @@ export class UserService {
     userId: number,
     deviceId: string,
   ): Promise<User> {
-    const userOAuth: UserOAuth = await this.userOAuthRepository.findOne({
-      where: {
-        user: { id: userId },
-        deviceId,
-      },
-    });
+    const userOAuth = await this.userOAuthRepository
+      .createQueryBuilder('userOAuth')
+      .addSelect('userOAuth.refreshToken') // refreshToken 명시적으로 포함
+      .leftJoin('userOAuth.user', 'user')
+      .where('user.id = :userId', { userId })
+      .andWhere('userOAuth.deviceId = :deviceId', { deviceId })
+      .getOne();
 
     if (!userOAuth.refreshToken) {
       return null;
