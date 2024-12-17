@@ -279,17 +279,19 @@ export class ProductService {
         ],
       });
 
-    const products = savedProducts.map(async (savedProduct) => {
-      const isSaved = true;
-      const userSaveCount = await this.getSavedUserCount(
-        savedProduct.product.id,
-      );
-      return {
-        ...savedProduct.product,
-        isSaved,
-        userSaveCount,
-      };
-    });
+    const products = await Promise.all(
+      savedProducts.map(async (savedProduct) => {
+        const isSaved = true;
+        const userSaveCount = await this.getSavedUserCount(
+          savedProduct.product.id,
+        );
+        return {
+          ...savedProduct.product,
+          isSaved,
+          userSaveCount,
+        };
+      }),
+    );
 
     this.logger.log(
       `Found ${products.length} saved products for userId: ${userId}`,

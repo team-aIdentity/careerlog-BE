@@ -247,17 +247,19 @@ export class ArticleService {
         skip: (page - 1) * take,
       });
 
-    const articles = savedArticles.map(async (savedArticle) => {
-      const isSaved = true;
-      const userSaveCount = await this.getSavedUserCount(
-        savedArticle.article.id,
-      );
-      return {
-        ...savedArticle.article,
-        isSaved,
-        userSaveCount,
-      };
-    });
+    const articles = await Promise.all(
+      savedArticles.map(async (savedArticle) => {
+        const isSaved = true;
+        const userSaveCount = await this.getSavedUserCount(
+          savedArticle.article.id,
+        );
+        return {
+          ...savedArticle.article,
+          isSaved,
+          userSaveCount,
+        };
+      }),
+    );
 
     this.logger.log(`Fetched ${articles.length} saved articles`);
     return {
