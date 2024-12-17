@@ -16,10 +16,15 @@ export class Cart {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.cart)
+  @ManyToOne(() => User, (user) => user.cart, {
+    onDelete: 'CASCADE',
+  })
   user: User;
 
-  @ManyToOne(() => Product, (product) => product.cart, { eager: true })
+  @ManyToOne(() => Product, (product) => product.cart, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
   product: Product;
 
   @Column({ nullable: true })

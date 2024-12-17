@@ -15,10 +15,14 @@ export class SavedProduct {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.savedProducts)
+  @ManyToOne(() => User, (user) => user.savedProducts, {
+    onDelete: 'CASCADE',
+  })
   user: User;
 
-  @ManyToOne(() => Product, (product) => product.userSaved)
+  @ManyToOne(() => Product, (product) => product.userSaved, {
+    onDelete: 'CASCADE',
+  })
   product: Product;
 
   @CreateDateColumn()

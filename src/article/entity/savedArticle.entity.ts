@@ -15,10 +15,16 @@ export class SavedArticle {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.savedArticles, { nullable: false })
+  @ManyToOne(() => User, (user) => user.savedArticles, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
   user: User;
 
-  @ManyToOne(() => Article, (article) => article.userSaved, { eager: true })
+  @ManyToOne(() => Article, (article) => article.userSaved, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
   article: Article;
 
   @CreateDateColumn()
