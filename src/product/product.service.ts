@@ -82,12 +82,6 @@ export class ProductService {
     const jobChangeStage = await this.jobChangeStageService.findOne(
       createProductDto.jobChangeStage,
     );
-    const user = await this.userService.findOne(userId);
-
-    if (!user) {
-      this.logger.warn(`User not found: ${userId}`);
-      throw new BadRequestException('User not found');
-    }
 
     const product = await this.productRepository.create({
       title: createProductDto.title,
@@ -98,7 +92,7 @@ export class ProductService {
       detailImage: createProductDto.detailImage,
       productLink: createProductDto.productLink || null,
       productGeneralLink: createProductDto.productGeneralLink || null,
-      user: user,
+      user: { id: userId },
       category,
       jobChangeStage,
       job,
@@ -275,7 +269,7 @@ export class ProductService {
         where: { user: { id: userId } },
         take,
         skip: (page - 1) * take,
-        relations: ['user', 'product'],
+        relations: ['product', 'product.user', 'product.user.profile'],
       });
 
     const products = savedProducts.map((savedProduct) => savedProduct.product);
@@ -284,7 +278,7 @@ export class ProductService {
       `Found ${products.length} saved products for userId: ${userId}`,
     );
     return {
-      data: products,
+      data: savedProducts,
       meta: {
         total,
         page,
