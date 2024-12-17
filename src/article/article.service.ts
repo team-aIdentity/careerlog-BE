@@ -247,9 +247,11 @@ export class ArticleService {
         skip: (page - 1) * take,
       });
 
-    const articles = savedArticles.map((savedArticle) => {
+    const articles = savedArticles.map(async (savedArticle) => {
       const isSaved = true;
-      const userSaveCount = this.getSavedUserCount(savedArticle.article.id);
+      const userSaveCount = await this.getSavedUserCount(
+        savedArticle.article.id,
+      );
       return {
         ...savedArticle.article,
         isSaved,

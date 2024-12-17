@@ -279,9 +279,11 @@ export class ProductService {
         ],
       });
 
-    const products = savedProducts.map((savedProduct) => {
+    const products = savedProducts.map(async (savedProduct) => {
       const isSaved = true;
-      const userSaveCount = this.getSavedUserCount(savedProduct.product.id);
+      const userSaveCount = await this.getSavedUserCount(
+        savedProduct.product.id,
+      );
       return {
         ...savedProduct.product,
         isSaved,
