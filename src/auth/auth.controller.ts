@@ -148,6 +148,7 @@ export class AuthController {
     });
     res.cookie('deviceId', 'kakao', {
       httpOnly: true,
+      sameSite: 'none',
     });
 
     return res.send({

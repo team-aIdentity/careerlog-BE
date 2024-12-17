@@ -19,15 +19,16 @@ export class JwtAccessAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<any> {
     try {
       const request = context.switchToHttp().getRequest();
-      const authorizationHeader = request.headers['authorization'];
+      // const authorizationHeader = request.headers['authorization'];
 
-      if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
-        throw new UnauthorizedException(
-          'Authorization header is missing or invalid',
-        );
-      }
+      // if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
+      //   throw new UnauthorizedException(
+      //     'Authorization header is missing or invalid',
+      //   );
+      // }
 
-      const accessToken = authorizationHeader.split(' ')[1];
+      // const accessToken = authorizationHeader.split(' ')[1];
+      const accessToken = request.cookies['accessToken'];
 
       const user = await this.jwtService.verifyAsync(accessToken, {
         secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
