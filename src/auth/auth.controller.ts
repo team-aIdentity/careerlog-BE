@@ -142,9 +142,11 @@ export class AuthController {
     res.setHeader('Authorization', 'Bearer ' + [accessToken, refreshToken]);
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
+      sameSite: 'none',
     });
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
+      sameSite: 'none',
     });
     res.cookie('deviceId', 'kakao', {
       httpOnly: true,
