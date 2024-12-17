@@ -82,6 +82,12 @@ export class ProductService {
     const jobChangeStage = await this.jobChangeStageService.findOne(
       createProductDto.jobChangeStage,
     );
+    const user = await this.userService.findOne(userId);
+
+    if (!user) {
+      this.logger.warn(`User not found: ${userId}`);
+      throw new BadRequestException('User not found');
+    }
 
     const product = await this.productRepository.create({
       title: createProductDto.title,
@@ -92,7 +98,7 @@ export class ProductService {
       detailImage: createProductDto.detailImage,
       productLink: createProductDto.productLink || null,
       productGeneralLink: createProductDto.productGeneralLink || null,
-      user: { id: userId },
+      user: user,
       category,
       jobChangeStage,
       job,

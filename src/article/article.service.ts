@@ -88,11 +88,17 @@ export class ArticleService {
       throw new BadRequestException('Job not found');
     }
 
+    const user = await this.userService.findOne(userId);
+    if (!user) {
+      this.logger.warn(`User not found: ${userId}`);
+      throw new BadRequestException('User not found');
+    }
+
     const article = this.articleRepository.create({
       title: createArticleDto.title,
       content: createArticleDto.content,
       thumbnail: createArticleDto.thumbnail,
-      user: { id: userId },
+      user: user,
       category: category,
       job: job,
     });
