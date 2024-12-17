@@ -143,14 +143,17 @@ export class AuthController {
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       sameSite: 'none',
+      secure: false,
     });
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'none',
+      secure: false,
     });
     res.cookie('deviceId', 'kakao', {
       httpOnly: true,
       sameSite: 'none',
+      secure: false,
     });
 
     return res.send({
