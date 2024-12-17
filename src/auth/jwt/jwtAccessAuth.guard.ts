@@ -37,7 +37,9 @@ export class JwtAccessAuthGuard implements CanActivate {
       request.user = user;
       return user;
     } catch (err) {
-      return false;
+      throw new UnauthorizedException(
+        'Authorization header is missing or invalid',
+      );
     }
   }
 }
