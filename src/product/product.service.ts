@@ -269,7 +269,14 @@ export class ProductService {
         where: { user: { id: userId } },
         take,
         skip: (page - 1) * take,
-        relations: ['product', 'product.user', 'product.user.profile'],
+        relations: [
+          'product',
+          'product.user',
+          'product.user.profile',
+          'product.category',
+          'product.jobChangeStage',
+          'product.job',
+        ],
       });
 
     const products = savedProducts.map((savedProduct) => savedProduct.product);
