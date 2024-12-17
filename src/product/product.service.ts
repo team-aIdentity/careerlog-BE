@@ -279,7 +279,15 @@ export class ProductService {
         ],
       });
 
-    const products = savedProducts.map((savedProduct) => savedProduct.product);
+    const products = savedProducts.map((savedProduct) => {
+      const isSaved = true;
+      const userSaveCount = this.getSavedUserCount(savedProduct.product.id);
+      return {
+        ...savedProduct.product,
+        isSaved,
+        userSaveCount,
+      };
+    });
 
     this.logger.log(
       `Found ${products.length} saved products for userId: ${userId}`,

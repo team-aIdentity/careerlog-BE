@@ -236,12 +236,26 @@ export class ArticleService {
     const [savedArticles, total] =
       await this.savedArticleRepository.findAndCount({
         where: { user: { id: userId } },
-        relations: ['article', 'article.user', 'article.user.profile'],
+        relations: [
+          'article',
+          'article.user',
+          'article.user.profile',
+          'article.category',
+          'article.job',
+        ],
         take,
         skip: (page - 1) * take,
       });
 
-    const articles = savedArticles.map((savedArticle) => savedArticle.article);
+    const articles = savedArticles.map((savedArticle) => {
+      const isSaved = true;
+      const userSaveCount = this.getSavedUserCount(savedArticle.article.id);
+      return {
+        ...savedArticle.article,
+        isSaved,
+        userSaveCount,
+      };
+    });
 
     this.logger.log(`Fetched ${articles.length} saved articles`);
     return {
