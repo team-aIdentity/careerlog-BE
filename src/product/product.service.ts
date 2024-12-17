@@ -285,7 +285,7 @@ export class ProductService {
       `Found ${products.length} saved products for userId: ${userId}`,
     );
     return {
-      data: savedProducts,
+      data: products,
       meta: {
         total,
         page,
