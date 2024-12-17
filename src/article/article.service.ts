@@ -250,13 +250,13 @@ export class ArticleService {
     const articles = await Promise.all(
       savedArticles.map(async (savedArticle) => {
         const isSaved = true;
-        const userSaveCount = await this.getSavedUserCount(
+        const savedUserCount = await this.getSavedUserCount(
           savedArticle.article.id,
         );
         return {
           ...savedArticle.article,
           isSaved,
-          userSaveCount,
+          savedUserCount,
         };
       }),
     );

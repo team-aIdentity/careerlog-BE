@@ -282,13 +282,13 @@ export class ProductService {
     const products = await Promise.all(
       savedProducts.map(async (savedProduct) => {
         const isSaved = true;
-        const userSaveCount = await this.getSavedUserCount(
+        const savedUserCount = await this.getSavedUserCount(
           savedProduct.product.id,
         );
         return {
           ...savedProduct.product,
           isSaved,
-          userSaveCount,
+          savedUserCount,
         };
       }),
     );
