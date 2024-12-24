@@ -16,7 +16,13 @@ export class Career {
   id: number;
 
   @Column({ nullable: false })
+  color: string;
+
+  @Column({ nullable: false })
   company: string;
+
+  @Column({ nullable: false })
+  team: string;
 
   @Column({ nullable: false })
   startAt: Date;

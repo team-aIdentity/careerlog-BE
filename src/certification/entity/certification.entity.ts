@@ -1,3 +1,4 @@
+import { User } from 'src/user/entity/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -6,10 +7,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from './user.entity';
 
 @Entity()
-export class Academic {
+export class Certification {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -17,18 +17,12 @@ export class Academic {
   name: string;
 
   @Column({ nullable: false })
-  major: string;
+  date: string;
 
   @Column({ nullable: false })
-  degree: string;
+  jurisdiction: string;
 
-  @Column({ nullable: false })
-  startAt: Date;
-
-  @Column({ nullable: true })
-  endAt: Date;
-
-  @ManyToOne(() => User, (user) => user.academics)
+  @ManyToOne(() => User, (user) => user.certifications)
   user: User;
 
   @CreateDateColumn()

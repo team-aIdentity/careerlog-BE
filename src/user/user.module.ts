@@ -4,7 +4,7 @@ import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
 import { Career } from 'src/career/entity/career.entity';
-import { Academic } from './entity/academic.entity';
+import { Academic } from 'src/academic/entity/academic.entity';
 import { Culture } from './entity/culture.entity';
 import { OAuthProvider } from './entity/oAuthProvider.entity';
 import { Profile } from './entity/profile.entity';

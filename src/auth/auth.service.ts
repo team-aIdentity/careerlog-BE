@@ -11,6 +11,10 @@ import { ConfigService } from '@nestjs/config';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refreshToken.dto';
 import { RegisterDto } from './dto/register.dto';
+import { VerifyCodeRequestDto } from './dto/verifyCodeRequest.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PhoneVerify } from './entity/phoneVerify.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +22,9 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+
+    @InjectRepository(PhoneVerify)
+    private readonly phoneVerifyRepository: Repository<PhoneVerify>,
   ) {}
 
   // credential jwt logic
@@ -168,5 +175,28 @@ export class AuthService {
     const saltOrRounds = 10;
     const hashedPwd = await bcrypt.hash(password, saltOrRounds);
     return hashedPwd;
+  }
+
+  async generatePhoneVerifyCode(): Promise<string> {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    return code;
+  }
+
+  async sendPhoneVerifyCode(
+    verifyCodeRequestDto: VerifyCodeRequestDto,
+  ): Promise<{ verifyCode: string }> {
+    const verifyCode = await this.generatePhoneVerifyCode();
+    const phoneNumber = verifyCodeRequestDto.phoneNumber;
+    const phoneVerify = await this.phoneVerifyRepository.create({
+      phoneNumber,
+      verifyCode,
+      expiredAt: new Date(Date.now() + 1000 * 60 * 5),
+      isVerified: false,
+    });
+    await this.phoneVerifyRepository.save(phoneVerify);
+
+    // send verify code to phone number
+
+    return { verifyCode };
   }
 }

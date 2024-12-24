@@ -4,6 +4,12 @@ export class CreateCareerDto {
   @IsString()
   company: string;
 
+  @IsString()
+  color: string;
+
+  @IsString()
+  team: string;
+
   @IsDateString()
   startAt: string;
 
