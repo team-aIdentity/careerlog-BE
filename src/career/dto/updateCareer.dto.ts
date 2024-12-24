@@ -5,6 +5,14 @@ export class UpdateCareerDto {
   @IsOptional()
   company: string;
 
+  @IsString()
+  @IsOptional()
+  color: string;
+
+  @IsString()
+  @IsOptional()
+  team: string;
+
   @IsDateString()
   @IsOptional()
   startAt: string;

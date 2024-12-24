@@ -24,6 +24,12 @@ import { JobChangeStageModule } from './job-change-stage/job-change-stage.module
 import { JobChangeStageService } from './job-change-stage/job-change-stage.service';
 import { UploadsModule } from './uploads/uploads.module';
 import { PaymentsController } from './payments/payments.controller';
+import { AcademicModule } from './academic/academic.module';
+import { ActivityModule } from './activity/activity.module';
+import { ProjectModule } from './project/project.module';
+import { SkillModule } from './skill/skill.module';
+import { LinkModule } from './link/link.module';
+import { CertificationModule } from './certification/certification.module';
 
 @Module({
   imports: [
@@ -43,6 +49,12 @@ import { PaymentsController } from './payments/payments.controller';
     JobChangeStageModule,
     UploadsModule,
     CareerModule,
+    AcademicModule,
+    ActivityModule,
+    ProjectModule,
+    SkillModule,
+    LinkModule,
+    CertificationModule,
   ],
   controllers: [
     AppController,

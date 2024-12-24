@@ -1,0 +1,67 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Project } from './entity/project.entity';
+import { CreateProjectDto } from './dto/createProject.dto';
+import { UpdateProjectDto } from './dto/updateProject.dto';
+
+@Injectable()
+export class ProjectService {
+  constructor(
+    @InjectRepository(Project)
+    private projectRepository: Repository<Project>,
+  ) {}
+
+  async findAll(userId: number, take: number, page: number) {
+    const [projects, total] = await this.projectRepository.findAndCount({
+      where: { user: { id: userId } },
+      take,
+      skip: (page - 1) * take,
+    });
+
+    return {
+      data: projects,
+      meta: {
+        total,
+        page,
+        last_page: Math.ceil(total / take),
+      },
+    };
+  }
+
+  async findOne(id: number, userId: number): Promise<Project> {
+    const project = await this.projectRepository.findOne({
+      where: { id, user: { id: userId } },
+    });
+    if (!project) {
+      throw new NotFoundException('Project not found');
+    }
+    return project;
+  }
+
+  async create(
+    createProjectDto: CreateProjectDto,
+    userId: number,
+  ): Promise<Project> {
+    const project = this.projectRepository.create({
+      ...createProjectDto,
+      user: { id: userId },
+    });
+    return await this.projectRepository.save(project);
+  }
+
+  async update(
+    id: number,
+    updateProjectDto: UpdateProjectDto,
+    userId: number,
+  ): Promise<Project> {
+    const project = await this.findOne(id, userId);
+    Object.assign(project, updateProjectDto);
+    return await this.projectRepository.save(project);
+  }
+
+  async delete(id: number, userId: number): Promise<void> {
+    const project = await this.findOne(id, userId);
+    await this.projectRepository.remove(project);
+  }
+}

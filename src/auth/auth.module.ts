@@ -14,11 +14,12 @@ import { JwtRefreshGuard } from './jwt/jwtRefresh.guard';
 import { KakaoAuthGuard } from './kakao/kakaoAuth.guard';
 import { KakaoStrategy } from './kakao/kakao.strategy';
 import { JwtAccessAuthGuard2 } from './jwt/jwtAccessAuth2.guard';
+import { PhoneVerify } from './entity/phoneVerify.entity';
 
 @Module({
   imports: [
     ConfigModule,
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, PhoneVerify]),
     PassportModule.register({}),
     JwtModule.registerAsync({
       imports: [ConfigModule],
