@@ -23,6 +23,7 @@ import { Skill } from 'src/skill/entity/skill.entity';
 import { Project } from 'src/project/entity/project.entity';
 import { Link } from 'src/link/entity/link.entity';
 import { Certification } from 'src/certification/entity/certification.entity';
+import { Language } from 'src/language/entity/language.entity';
 
 @Entity()
 export class User {
@@ -55,6 +56,9 @@ export class User {
 
   @OneToMany(() => Skill, (skill) => skill.user)
   skills: Skill[];
+
+  @OneToMany(() => Language, (language) => language.user)
+  languages: Language[];
 
   @OneToMany(() => Link, (link) => link.user)
   links: Link[];
