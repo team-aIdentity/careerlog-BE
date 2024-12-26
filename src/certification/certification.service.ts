@@ -15,12 +15,14 @@ export class CertificationService {
   async findAll(userId: number): Promise<Certification[]> {
     return await this.certificationRepository.find({
       where: { user: { id: userId } },
+      relations: ['user', 'user.profile'],
     });
   }
 
   async findOne(id: number, userId: number): Promise<Certification> {
     const certification = await this.certificationRepository.findOne({
       where: { id, user: { id: userId } },
+      relations: ['user', 'user.profile'],
     });
     if (!certification) {
       throw new NotFoundException('Certification not found');

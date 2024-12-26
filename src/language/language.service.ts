@@ -15,12 +15,14 @@ export class LanguageService {
   async findAll(userId: number): Promise<Language[]> {
     return await this.languageRepository.find({
       where: { user: { id: userId } },
+      relations: ['user', 'user.profile'],
     });
   }
 
   async findOne(id: number, userId: number): Promise<Language> {
     const language = await this.languageRepository.findOne({
       where: { id, user: { id: userId } },
+      relations: ['user', 'user.profile'],
     });
     if (!language) {
       throw new NotFoundException('Language not found');

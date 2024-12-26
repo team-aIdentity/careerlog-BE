@@ -15,12 +15,14 @@ export class LinkService {
   async findAll(userId: number): Promise<Link[]> {
     return await this.linkRepository.find({
       where: { user: { id: userId } },
+      relations: ['user', 'user.profile'],
     });
   }
 
   async findOne(id: number, userId: number): Promise<Link> {
     const link = await this.linkRepository.findOne({
       where: { id, user: { id: userId } },
+      relations: ['user', 'user.profile'],
     });
     if (!link) {
       throw new NotFoundException('Link not found');

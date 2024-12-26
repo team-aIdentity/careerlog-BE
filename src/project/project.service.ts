@@ -15,6 +15,7 @@ export class ProjectService {
   async findAll(userId: number, take: number, page: number) {
     const [projects, total] = await this.projectRepository.findAndCount({
       where: { user: { id: userId } },
+      relations: ['user', 'user.profile'],
       take,
       skip: (page - 1) * take,
     });
@@ -32,6 +33,7 @@ export class ProjectService {
   async findOne(id: number, userId: number): Promise<Project> {
     const project = await this.projectRepository.findOne({
       where: { id, user: { id: userId } },
+      relations: ['user', 'user.profile'],
     });
     if (!project) {
       throw new NotFoundException('Project not found');

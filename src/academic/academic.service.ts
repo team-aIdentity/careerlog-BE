@@ -15,6 +15,7 @@ export class AcademicService {
   async findAll(userId: number, take: number, page: number) {
     const [academics, total] = await this.academicRepository.findAndCount({
       where: { user: { id: userId } },
+      relations: ['user', 'user.profile'],
       take,
       skip: (page - 1) * take,
     });
@@ -32,6 +33,7 @@ export class AcademicService {
   async findOne(academicId: number, userId: number) {
     const academic = await this.academicRepository.findOne({
       where: { id: academicId, user: { id: userId } },
+      relations: ['user', 'user.profile'],
     });
 
     if (!academic) {

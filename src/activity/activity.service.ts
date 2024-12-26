@@ -15,6 +15,7 @@ export class ActivityService {
   async findAll(userId: number, take: number, page: number) {
     const [activities, total] = await this.activityRepository.findAndCount({
       where: { user: { id: userId } },
+      relations: ['user', 'user.profile'],
       take,
       skip: (page - 1) * take,
     });
@@ -32,6 +33,7 @@ export class ActivityService {
   async findOne(id: number, userId: number): Promise<Activity> {
     const activity = await this.activityRepository.findOne({
       where: { id, user: { id: userId } },
+      relations: ['user', 'user.profile'],
     });
     if (!activity) {
       throw new NotFoundException('Activity not found');
