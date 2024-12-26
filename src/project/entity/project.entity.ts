@@ -26,10 +26,10 @@ export class Project {
   description: string;
 
   @Column({ nullable: false })
-  startAt: Date;
+  startAt: string;
 
   @Column({ nullable: true })
-  endAt: Date;
+  endAt: string;
 
   @Column({ nullable: false })
   contribution: number;

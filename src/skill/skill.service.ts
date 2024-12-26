@@ -46,8 +46,9 @@ export class SkillService {
     return await this.skillRepository.save(skill);
   }
 
-  async delete(id: number, userId: number): Promise<void> {
+  async delete(id: number, userId: number): Promise<any> {
     const skill = await this.findOne(id, userId);
     await this.skillRepository.remove(skill);
+    return { message: 'Skill deleted successfully', skill };
   }
 }

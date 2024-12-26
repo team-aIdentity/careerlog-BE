@@ -19,9 +19,6 @@ export class Link {
   @Column()
   url: string;
 
-  @Column()
-  date: Date;
-
   @ManyToOne(() => User, (user) => user.links)
   user: User;
 

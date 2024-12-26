@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsDate } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 
 export class CreateActivityDto {
   @IsString()
@@ -11,11 +11,11 @@ export class CreateActivityDto {
   @IsString()
   description: string;
 
-  @IsDate()
+  @IsString()
   @IsOptional()
-  startAt?: Date;
+  startAt?: string;
 
-  @IsDate()
+  @IsString()
   @IsOptional()
-  endAt?: Date;
+  endAt?: string;
 }

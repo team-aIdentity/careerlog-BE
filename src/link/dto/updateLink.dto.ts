@@ -1,4 +1,4 @@
-import { IsString, IsUrl, IsDate, IsOptional } from 'class-validator';
+import { IsString, IsUrl, IsOptional } from 'class-validator';
 
 export class UpdateLinkDto {
   @IsString()
@@ -8,8 +8,4 @@ export class UpdateLinkDto {
   @IsUrl()
   @IsOptional()
   url?: string;
-
-  @IsDate()
-  @IsOptional()
-  date?: Date;
 }

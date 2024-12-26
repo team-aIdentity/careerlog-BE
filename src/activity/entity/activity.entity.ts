@@ -23,10 +23,10 @@ export class Activity {
   description: string;
 
   @Column({ nullable: true })
-  startAt: Date;
+  startAt: string;
 
   @Column({ nullable: true })
-  endAt: Date;
+  endAt: string;
 
   @ManyToOne(() => User, (user) => user.activities)
   user: User;

@@ -1,4 +1,4 @@
-import { IsString, IsUrl, IsDate } from 'class-validator';
+import { IsString, IsUrl } from 'class-validator';
 
 export class CreateLinkDto {
   @IsString()
@@ -6,7 +6,4 @@ export class CreateLinkDto {
 
   @IsUrl()
   url: string;
-
-  @IsDate()
-  date: Date;
 }

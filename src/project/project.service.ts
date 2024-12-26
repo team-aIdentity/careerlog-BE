@@ -60,8 +60,9 @@ export class ProjectService {
     return await this.projectRepository.save(project);
   }
 
-  async delete(id: number, userId: number): Promise<void> {
+  async delete(id: number, userId: number): Promise<any> {
     const project = await this.findOne(id, userId);
     await this.projectRepository.remove(project);
+    return { message: 'Project deleted successfully', project };
   }
 }

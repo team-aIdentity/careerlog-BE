@@ -49,8 +49,9 @@ export class LanguageService {
     return await this.languageRepository.save(language);
   }
 
-  async delete(id: number, userId: number): Promise<void> {
+  async delete(id: number, userId: number): Promise<any> {
     const language = await this.findOne(id, userId);
     await this.languageRepository.remove(language);
+    return { message: 'Language deleted successfully', language };
   }
 }

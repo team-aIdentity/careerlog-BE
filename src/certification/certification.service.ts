@@ -49,8 +49,9 @@ export class CertificationService {
     return await this.certificationRepository.save(certification);
   }
 
-  async delete(id: number, userId: number): Promise<void> {
+  async delete(id: number, userId: number): Promise<any> {
     const certification = await this.findOne(id, userId);
     await this.certificationRepository.remove(certification);
+    return { message: 'Certification deleted successfully', certification };
   }
 }

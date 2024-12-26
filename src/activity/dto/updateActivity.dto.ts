@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsDate } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 
 export class UpdateActivityDto {
   @IsString()
@@ -13,11 +13,11 @@ export class UpdateActivityDto {
   @IsOptional()
   description?: string;
 
-  @IsDate()
+  @IsString()
   @IsOptional()
-  startAt?: Date;
+  startAt?: string;
 
-  @IsDate()
+  @IsString()
   @IsOptional()
-  endAt?: Date;
+  endAt?: string;
 }
