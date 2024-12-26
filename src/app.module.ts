@@ -31,6 +31,7 @@ import { SkillModule } from './skill/skill.module';
 import { LinkModule } from './link/link.module';
 import { CertificationModule } from './certification/certification.module';
 import { LanguageModule } from './language/language.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { LanguageModule } from './language/language.module';
     LinkModule,
     CertificationModule,
     LanguageModule,
+    ReviewModule,
   ],
   controllers: [
     AppController,

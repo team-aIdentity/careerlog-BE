@@ -13,6 +13,7 @@ import { Cart } from './cart.entity';
 import { ProductCategory } from './productCategory.entity';
 import { JobChangeStage } from 'src/job-change-stage/entity/jobChangeStage.entity';
 import { Job } from 'src/job/entity/job.entity';
+import { Review } from 'src/review/entity/review.entity';
 
 @Entity()
 export class Product {
@@ -69,6 +70,9 @@ export class Product {
 
   @ManyToOne(() => Job, (job) => job.products)
   job: Job;
+
+  @OneToMany(() => Review, (review) => review.product)
+  reviews: Review[];
 
   @CreateDateColumn()
   createdAt: Date;

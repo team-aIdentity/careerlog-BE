@@ -24,6 +24,7 @@ import { Project } from 'src/project/entity/project.entity';
 import { Link } from 'src/link/entity/link.entity';
 import { Certification } from 'src/certification/entity/certification.entity';
 import { Language } from 'src/language/entity/language.entity';
+import { Review } from 'src/review/entity/review.entity';
 
 @Entity()
 export class User {
@@ -89,6 +90,9 @@ export class User {
 
   @OneToMany(() => Cart, (cart) => cart.user)
   cart: Cart[];
+
+  @OneToMany(() => Review, (review) => review.user)
+  reviews: Review[];
 
   @CreateDateColumn()
   createdAt: Date;
