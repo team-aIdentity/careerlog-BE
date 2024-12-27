@@ -1,4 +1,4 @@
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class UpdateProfileDto {
   @IsOptional()
@@ -32,6 +32,10 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsBoolean()
   isNeedOffer?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  expectedOrganizationCulture?: number;
 
   @IsOptional()
   @IsBoolean()

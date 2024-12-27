@@ -1,4 +1,5 @@
 import { Article } from 'src/article/entity/article.entity';
+import { SecondaryOccupation } from 'src/career/entity/secondaryOccupation.entity';
 import { Product } from 'src/product/entity/product.entity';
 import {
   Column,
@@ -24,6 +25,12 @@ export class Job {
 
   @OneToMany(() => Product, (product) => product.job)
   products: Product[];
+
+  @OneToMany(
+    () => SecondaryOccupation,
+    (secondaryOccupation) => secondaryOccupation.primaryOccupation,
+  )
+  secondaryOccupations: SecondaryOccupation[];
 
   @CreateDateColumn()
   createdAt: Date;

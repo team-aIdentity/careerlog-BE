@@ -7,8 +7,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { PrimaryOccupation } from './primaryOccupation.entity';
 import { Career } from './career.entity';
+import { Job } from 'src/job/entity/job.entity';
 
 @Entity()
 export class SecondaryOccupation {
@@ -18,11 +18,8 @@ export class SecondaryOccupation {
   @Column({ nullable: false })
   name: string;
 
-  @ManyToOne(
-    () => PrimaryOccupation,
-    (primaryOccupation) => primaryOccupation.secondaryOccupations,
-  )
-  primaryOccupation: PrimaryOccupation;
+  @ManyToOne(() => Job, (job) => job.secondaryOccupations)
+  primaryOccupation: Job;
 
   @OneToMany(() => Career, (career) => career.jobRank)
   careers: Career[];

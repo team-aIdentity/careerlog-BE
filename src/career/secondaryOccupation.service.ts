@@ -4,15 +4,15 @@ import { Repository } from 'typeorm';
 import { SecondaryOccupation } from './entity/secondaryOccupation.entity';
 import { CreateSecondaryOccupationDto } from './dto/createSecondaryOccupation.dto';
 import { UpdateSecondaryOccupationDto } from './dto/updateSecondaryOccupation.dto';
-import { PrimaryOccupation } from './entity/primaryOccupation.entity';
+import { Job } from 'src/job/entity/job.entity';
 
 @Injectable()
 export class SecondaryOccupationService {
   constructor(
     @InjectRepository(SecondaryOccupation)
     private secondaryOccupationRepository: Repository<SecondaryOccupation>,
-    @InjectRepository(PrimaryOccupation)
-    private primaryOccupationRepository: Repository<PrimaryOccupation>,
+    @InjectRepository(Job)
+    private jobRepository: Repository<Job>,
   ) {}
 
   async findAll() {
@@ -34,7 +34,7 @@ export class SecondaryOccupationService {
   }
 
   async create(createSecondaryOccupationDto: CreateSecondaryOccupationDto) {
-    const primaryOccupation = await this.primaryOccupationRepository.findOne({
+    const primaryOccupation = await this.jobRepository.findOne({
       where: { id: createSecondaryOccupationDto.primaryOccupationId },
     });
     if (!primaryOccupation) {
@@ -53,7 +53,7 @@ export class SecondaryOccupationService {
   ) {
     const secondaryOccupation = await this.findOne(id);
     if (updateSecondaryOccupationDto.primaryOccupationId) {
-      const primaryOccupation = await this.primaryOccupationRepository.findOne({
+      const primaryOccupation = await this.jobRepository.findOne({
         where: { id: updateSecondaryOccupationDto.primaryOccupationId },
       });
       if (!primaryOccupation) {

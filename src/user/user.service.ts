@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from './entity/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,6 +14,10 @@ import { UserRole } from './entity/userRole.entity';
 import { OAuthProvider } from './entity/oAuthProvider.entity';
 import { UpdateProfileDto } from './dto/updateProfile.dto';
 import { Profile } from './entity/profile.entity';
+import { Career } from 'src/career/entity/career.entity';
+import { Culture } from './entity/culture.entity';
+import { CreateCultureDto } from './dto/createCulture.dto';
+import { UpdateCultureDto } from './dto/updateCulture.dto';
 
 @Injectable()
 export class UserService {
@@ -28,6 +36,10 @@ export class UserService {
     private oAuthProvider: Repository<OAuthProvider>,
     @InjectRepository(Profile)
     private profileRepository: Repository<Profile>,
+    @InjectRepository(Career)
+    private careerRepository: Repository<Career>,
+    @InjectRepository(Culture)
+    private cultureRepository: Repository<Culture>,
   ) {}
 
   // user feature
@@ -158,6 +170,13 @@ export class UserService {
       profile.isShareLink = updateProfileDto.isShareLink || false;
     if (updateProfileDto.isNeedOffer !== undefined)
       profile.isNeedOffer = updateProfileDto.isNeedOffer || false;
+
+    if (updateProfileDto.expectedOrganizationCulture !== undefined) {
+      const expectedOrganizationCulture = await this.cultureRepository.findOne({
+        where: { id: updateProfileDto.expectedOrganizationCulture },
+      });
+      profile.expectCulture = expectedOrganizationCulture;
+    }
 
     await this.profileRepository.save(profile);
     return profile;
@@ -327,5 +346,87 @@ export class UserService {
     existingUser.lastActiveDate = new Date();
     this.userRepository.save(existingUser);
     return existingUser;
+  }
+
+  async getProfile(userId: number): Promise<any> {
+    const profile = await this.profileRepository.findOne({
+      where: { user: { id: userId } },
+      relations: ['expectCulture'],
+    });
+    const user = await this.findOne(userId);
+    const career = await this.careerRepository.findOne({
+      where: { user: { id: userId } },
+      order: { startAt: 'DESC' },
+      relations: ['occupation', 'occupation.primaryOccupation'],
+    });
+
+    if (!career) {
+      throw new BadRequestException('Career not found');
+    }
+
+    const responseDto = {
+      name: profile.name,
+      email: user.email,
+      phone: profile.phone,
+      // address: profile.address,
+      currentCompany: career.company,
+      currentJob: career.occupation.name,
+      currentJobCategory: career.occupation.primaryOccupation.name,
+      careerYear: career.totalYear,
+      expectSalary: profile.expectSalary,
+      careerGoal: profile.careerGoal,
+      expectedOrganizationCulture: {
+        title: profile.expectCulture?.name,
+        description: profile.expectCulture?.description,
+      },
+    };
+
+    for (const key in responseDto) {
+      if (responseDto[key] === undefined || responseDto[key] === null) {
+        return null;
+      }
+    }
+
+    if (
+      responseDto.expectedOrganizationCulture.title === undefined ||
+      responseDto.expectedOrganizationCulture.title === null ||
+      responseDto.expectedOrganizationCulture.description === undefined ||
+      responseDto.expectedOrganizationCulture.description === null
+    ) {
+      return null;
+    }
+    return responseDto;
+  }
+
+  async findAllCultures(): Promise<Culture[]> {
+    return await this.cultureRepository.find();
+  }
+
+  async findCultureById(id: number): Promise<Culture> {
+    const culture = await this.cultureRepository.findOne({ where: { id } });
+    if (!culture) {
+      throw new NotFoundException('Culture not found');
+    }
+    return culture;
+  }
+
+  async createCulture(createCultureDto: CreateCultureDto): Promise<Culture> {
+    const culture = this.cultureRepository.create(createCultureDto);
+    return await this.cultureRepository.save(culture);
+  }
+
+  async updateCulture(
+    id: number,
+    updateCultureDto: UpdateCultureDto,
+  ): Promise<Culture> {
+    const culture = await this.findCultureById(id);
+    Object.assign(culture, updateCultureDto);
+    return await this.cultureRepository.save(culture);
+  }
+
+  async deleteCulture(id: number): Promise<any> {
+    const culture = await this.findCultureById(id);
+    await this.cultureRepository.remove(culture);
+    return { message: 'Culture deleted successfully', culture };
   }
 }
