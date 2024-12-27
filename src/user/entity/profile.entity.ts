@@ -29,6 +29,9 @@ export class Profile {
   phone: string;
 
   @Column({ nullable: true })
+  address: string;
+
+  @Column({ nullable: true })
   birthDate: string;
 
   @Column({ nullable: true })

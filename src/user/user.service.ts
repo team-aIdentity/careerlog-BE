@@ -170,6 +170,8 @@ export class UserService {
       profile.isShareLink = updateProfileDto.isShareLink || false;
     if (updateProfileDto.isNeedOffer !== undefined)
       profile.isNeedOffer = updateProfileDto.isNeedOffer || false;
+    if (updateProfileDto.address !== undefined)
+      profile.address = updateProfileDto.address;
 
     if (updateProfileDto.expectedOrganizationCulture !== undefined) {
       const expectedOrganizationCulture = await this.cultureRepository.findOne({
@@ -368,7 +370,7 @@ export class UserService {
       name: profile.name,
       email: user.email,
       phone: profile.phone,
-      // address: profile.address,
+      address: profile.address,
       currentCompany: career.company,
       currentJob: career.occupation.name,
       currentJobCategory: career.occupation.primaryOccupation.name,

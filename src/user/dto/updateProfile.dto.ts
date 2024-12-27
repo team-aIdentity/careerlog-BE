@@ -30,6 +30,10 @@ export class UpdateProfileDto {
   expectSalary?: string;
 
   @IsOptional()
+  @IsString()
+  address?: string;
+
+  @IsOptional()
   @IsBoolean()
   isNeedOffer?: boolean;
 
