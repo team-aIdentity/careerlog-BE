@@ -1,4 +1,10 @@
-import { IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
+import {
+  IsDateString,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsBoolean,
+} from 'class-validator';
 
 export class UpdateCareerDto {
   @IsString()
@@ -12,6 +18,10 @@ export class UpdateCareerDto {
   @IsString()
   @IsOptional()
   team: string;
+
+  @IsBoolean()
+  @IsOptional()
+  isCurrent: boolean;
 
   @IsDateString()
   @IsOptional()

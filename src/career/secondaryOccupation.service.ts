@@ -21,6 +21,12 @@ export class SecondaryOccupationService {
     });
   }
 
+  async findWithPrimaryOccupation(id: number) {
+    return await this.secondaryOccupationRepository.find({
+      where: { primaryOccupation: { id } },
+    });
+  }
+
   async findOne(id: number) {
     const secondaryOccupation =
       await this.secondaryOccupationRepository.findOne({

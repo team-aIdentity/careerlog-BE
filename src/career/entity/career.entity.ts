@@ -33,6 +33,9 @@ export class Career {
   @Column({ nullable: true, type: 'int', default: null })
   totalYear: number;
 
+  @Column({ nullable: false, default: false })
+  isCurrent: boolean;
+
   @ManyToOne(
     () => SecondaryOccupation,
     (secondaryOccupation) => secondaryOccupation.careers,

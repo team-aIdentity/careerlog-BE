@@ -28,6 +28,13 @@ export class SecondaryOccupationController {
     return await this.secondaryOccupationService.findAll();
   }
 
+  @Get('primary-occupation/:id')
+  async getPrimaryOccupationById(@Param('id') primaryOccupationId: number) {
+    return await this.secondaryOccupationService.findWithPrimaryOccupation(
+      primaryOccupationId,
+    );
+  }
+
   @Get(':id')
   async getSecondaryOccupationById(@Param('id') secondaryOccupationId: number) {
     return await this.secondaryOccupationService.findOne(secondaryOccupationId);

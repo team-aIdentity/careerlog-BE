@@ -21,10 +21,28 @@ export class CareerService {
   async findAll(userId: number, take: number, page: number) {
     const [careers, total] = await this.careerRepository.findAndCount({
       where: { user: { id: userId } },
+      order: { startAt: 'DESC' },
       take,
       skip: (page - 1) * take,
       relations: ['occupation', 'jobRank'],
     });
+
+    let totalCareerYears = 0;
+    let totalCareerMonths = 0;
+
+    if (total != 0) {
+      const oldestCareer = careers[careers.length - 1];
+      const newestCareer = careers[0];
+      const endAt = newestCareer.endAt
+        ? new Date(newestCareer.endAt)
+        : new Date();
+      const startAt = new Date(oldestCareer.startAt);
+      const totalYears = endAt.getFullYear() - startAt.getFullYear();
+      const totalMonths =
+        endAt.getMonth() - startAt.getMonth() + totalYears * 12;
+      totalCareerYears = Math.floor(totalMonths / 12);
+      totalCareerMonths = totalMonths % 12;
+    }
 
     return {
       data: careers,
@@ -32,6 +50,8 @@ export class CareerService {
         total,
         page,
         last_page: Math.ceil(total / take),
+        totalCareerYears,
+        totalCareerMonths,
       },
     };
   }

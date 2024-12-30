@@ -362,42 +362,45 @@ export class UserService {
       relations: ['occupation', 'occupation.primaryOccupation'],
     });
 
-    if (!career) {
-      throw new BadRequestException('Career not found');
-    }
-
     const responseDto = {
       name: profile.name,
       email: user.email,
       phone: profile.phone,
       address: profile.address,
-      currentCompany: career.company,
-      currentJob: career.occupation.name,
-      currentJobCategory: career.occupation.primaryOccupation.name,
-      careerYear: career.totalYear,
+      currentCompany: career?.company,
+      currentJob: career?.occupation?.name,
+      currentJobCategory: career?.occupation?.primaryOccupation?.name,
+      careerYear: career?.totalYear,
       expectSalary: profile.expectSalary,
       careerGoal: profile.careerGoal,
       expectedOrganizationCulture: {
         title: profile.expectCulture?.name,
         description: profile.expectCulture?.description,
       },
+      profileImage: profile.image,
+      isGetOffer: profile.isNeedOffer,
     };
 
-    for (const key in responseDto) {
-      if (responseDto[key] === undefined || responseDto[key] === null) {
-        return null;
-      }
-    }
+    const isCompleteProfile = [
+      responseDto.name,
+      responseDto.email,
+      responseDto.phone,
+      responseDto.address,
+      responseDto.expectSalary,
+      responseDto.careerGoal,
+      responseDto.profileImage,
+    ].every((value) => value !== undefined && value !== null);
 
-    if (
-      responseDto.expectedOrganizationCulture.title === undefined ||
-      responseDto.expectedOrganizationCulture.title === null ||
-      responseDto.expectedOrganizationCulture.description === undefined ||
-      responseDto.expectedOrganizationCulture.description === null
-    ) {
-      return null;
-    }
-    return responseDto;
+    const isCompleteCulture =
+      responseDto.expectedOrganizationCulture.title !== undefined &&
+      responseDto.expectedOrganizationCulture.title !== null &&
+      responseDto.expectedOrganizationCulture.description !== undefined &&
+      responseDto.expectedOrganizationCulture.description !== null;
+
+    return {
+      code: isCompleteProfile && isCompleteCulture ? 1 : 0,
+      data: responseDto,
+    };
   }
 
   async findAllCultures(): Promise<Culture[]> {
