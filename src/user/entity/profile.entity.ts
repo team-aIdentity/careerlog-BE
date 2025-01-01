@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { Culture } from './culture.entity';
 import { User } from './user.entity';
+import { SecondaryOccupation } from 'src/career/entity/secondaryOccupation.entity';
 
 @Entity()
 export class Profile {
@@ -45,6 +46,12 @@ export class Profile {
 
   @Column({ default: false })
   isShareLink: boolean;
+
+  @ManyToOne(
+    () => SecondaryOccupation,
+    (secondaryOccupation) => secondaryOccupation.profiles,
+  )
+  job: SecondaryOccupation;
 
   @ManyToOne(() => Culture, (culture) => culture.profiles)
   expectCulture: Culture;

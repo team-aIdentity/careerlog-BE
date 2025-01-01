@@ -18,6 +18,7 @@ import { Career } from 'src/career/entity/career.entity';
 import { Culture } from './entity/culture.entity';
 import { CreateCultureDto } from './dto/createCulture.dto';
 import { UpdateCultureDto } from './dto/updateCulture.dto';
+import { SecondaryOccupation } from 'src/career/entity/secondaryOccupation.entity';
 
 @Injectable()
 export class UserService {
@@ -40,6 +41,8 @@ export class UserService {
     private careerRepository: Repository<Career>,
     @InjectRepository(Culture)
     private cultureRepository: Repository<Culture>,
+    @InjectRepository(SecondaryOccupation)
+    private secondaryOccupationRepository: Repository<SecondaryOccupation>,
   ) {}
 
   // user feature
@@ -172,6 +175,13 @@ export class UserService {
       profile.isNeedOffer = updateProfileDto.isNeedOffer || false;
     if (updateProfileDto.address !== undefined)
       profile.address = updateProfileDto.address;
+    if (updateProfileDto.job !== undefined) {
+      const secondaryOccupation =
+        await this.secondaryOccupationRepository.findOne({
+          where: { id: updateProfileDto.job },
+        });
+      profile.job = secondaryOccupation;
+    }
 
     if (updateProfileDto.expectedOrganizationCulture !== undefined) {
       const expectedOrganizationCulture = await this.cultureRepository.findOne({
@@ -353,7 +363,7 @@ export class UserService {
   async getProfile(userId: number): Promise<any> {
     const profile = await this.profileRepository.findOne({
       where: { user: { id: userId } },
-      relations: ['expectCulture'],
+      relations: ['expectCulture', 'job'],
     });
     const user = await this.findOne(userId);
     const career = await this.careerRepository.findOne({
@@ -362,43 +372,46 @@ export class UserService {
       relations: ['occupation', 'occupation.primaryOccupation'],
     });
 
+    const secondaryOccupation =
+      await this.secondaryOccupationRepository.findOne({
+        where: { profiles: { user: { id: userId } } },
+        relations: ['profiles', 'primaryOccupation'],
+      });
+
     const responseDto = {
+      image: profile.image,
       name: profile.name,
       email: user.email,
       phone: profile.phone,
       address: profile.address,
-      currentCompany: career?.company,
-      currentJob: career?.occupation?.name,
-      currentJobCategory: career?.occupation?.primaryOccupation?.name,
-      careerYear: career?.totalYear,
-      expectSalary: profile.expectSalary,
+      primaryOccupationId: secondaryOccupation?.primaryOccupation?.id,
+      primaryOccupation: secondaryOccupation?.primaryOccupation?.name,
+      secondaryOccupationId: secondaryOccupation?.id,
+      secondaryOccupation: secondaryOccupation?.name,
+      expectedSalary: profile.expectSalary,
+      expectedOrganizationCultureId: profile.expectCulture?.id,
+      expectedOrganizationCultureImage: '',
+      expectedOrganizationCultureTitle: profile.expectCulture?.name,
+      expectedOrganizationCultureDescription:
+        profile.expectCulture?.description,
       careerGoal: profile.careerGoal,
-      expectedOrganizationCulture: {
-        title: profile.expectCulture?.name,
-        description: profile.expectCulture?.description,
-      },
-      profileImage: profile.image,
-      isGetOffer: profile.isNeedOffer,
+      isNeedOffer: profile.isNeedOffer,
     };
+    console.log(secondaryOccupation);
+    console.log(responseDto);
 
     const isCompleteProfile = [
       responseDto.name,
       responseDto.email,
       responseDto.phone,
       responseDto.address,
-      responseDto.expectSalary,
+      responseDto.expectedSalary,
       responseDto.careerGoal,
-      responseDto.profileImage,
+      responseDto.image,
     ].every((value) => value !== undefined && value !== null);
 
-    const isCompleteCulture =
-      responseDto.expectedOrganizationCulture.title !== undefined &&
-      responseDto.expectedOrganizationCulture.title !== null &&
-      responseDto.expectedOrganizationCulture.description !== undefined &&
-      responseDto.expectedOrganizationCulture.description !== null;
-
     return {
-      code: isCompleteProfile && isCompleteCulture ? 1 : 0,
+      code: isCompleteProfile ? 1 : 0,
       data: responseDto,
     };
   }

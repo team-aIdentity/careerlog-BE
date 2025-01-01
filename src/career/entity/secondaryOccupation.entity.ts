@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Career } from './career.entity';
 import { Job } from 'src/job/entity/job.entity';
+import { Profile } from 'src/user/entity/profile.entity';
 
 @Entity()
 export class SecondaryOccupation {
@@ -23,6 +24,9 @@ export class SecondaryOccupation {
 
   @OneToMany(() => Career, (career) => career.jobRank)
   careers: Career[];
+
+  @OneToMany(() => Profile, (profile) => profile.job)
+  profiles: Profile[];
 
   @CreateDateColumn()
   createdAt: Date;

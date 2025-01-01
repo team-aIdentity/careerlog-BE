@@ -44,4 +44,8 @@ export class UpdateProfileDto {
   @IsOptional()
   @IsBoolean()
   isShareLink?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  job?: number;
 }

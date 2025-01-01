@@ -16,6 +16,7 @@ import { JwtService } from '@nestjs/jwt';
 import { SavedArticle } from 'src/article/entity/savedArticle.entity';
 import { Product } from 'src/product/entity/product.entity';
 import { SavedProduct } from 'src/product/entity/savedProduct.entity';
+import { SecondaryOccupation } from 'src/career/entity/secondaryOccupation.entity';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { SavedProduct } from 'src/product/entity/savedProduct.entity';
       SavedArticle,
       Product,
       SavedProduct,
+      SecondaryOccupation,
     ]),
     ConfigModule,
   ],
