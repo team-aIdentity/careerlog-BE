@@ -127,4 +127,15 @@ export class CareerService {
     const career = await this.findOne(careerId, userId);
     return await this.careerRepository.remove(career);
   }
+
+  async checkCareer(userId: number) {
+    const careerCount = await this.careerRepository.count({
+      where: { user: { id: userId } },
+    });
+
+    return {
+      code: careerCount > 0 ? 1 : 0,
+      message: careerCount > 0 ? 'Career exists' : 'Career not exists',
+    };
+  }
 }

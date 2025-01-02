@@ -29,6 +29,12 @@ export class CareerController {
     return await this.careerService.findAll(req.user.id, take, page);
   }
 
+  @Get('check')
+  @UseGuards(JwtAccessAuthGuard)
+  async checkCareer(@Req() req: any) {
+    return await this.careerService.checkCareer(req.user.id);
+  }
+
   @Get(':id')
   @UseGuards(JwtAccessAuthGuard)
   async getCareerById(@Param('id') careerId: number, @Req() req: any) {

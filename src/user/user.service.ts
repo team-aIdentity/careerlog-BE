@@ -366,11 +366,6 @@ export class UserService {
       relations: ['expectCulture', 'job'],
     });
     const user = await this.findOne(userId);
-    const career = await this.careerRepository.findOne({
-      where: { user: { id: userId } },
-      order: { startAt: 'DESC' },
-      relations: ['occupation', 'occupation.primaryOccupation'],
-    });
 
     const secondaryOccupation =
       await this.secondaryOccupationRepository.findOne({
@@ -397,8 +392,6 @@ export class UserService {
       careerGoal: profile.careerGoal,
       isNeedOffer: profile.isNeedOffer,
     };
-    console.log(secondaryOccupation);
-    console.log(responseDto);
 
     const isCompleteProfile = [
       responseDto.name,
@@ -408,6 +401,8 @@ export class UserService {
       responseDto.expectedSalary,
       responseDto.careerGoal,
       responseDto.image,
+      responseDto.primaryOccupationId,
+      responseDto.secondaryOccupationId,
     ].every((value) => value !== undefined && value !== null);
 
     return {
