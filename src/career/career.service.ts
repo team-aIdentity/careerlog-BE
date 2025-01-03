@@ -4,19 +4,54 @@ import { Repository } from 'typeorm';
 import { Career } from './entity/career.entity';
 import { CreateCareerDto } from './dto/createCareer.dto';
 import { UpdateCareerDto } from './dto/updateCareer.dto';
-import { SecondaryOccupation } from './entity/secondaryOccupation.entity';
-import { JobRank } from './entity/jobRank.entity';
 
 @Injectable()
 export class CareerService {
   constructor(
     @InjectRepository(Career)
     private careerRepository: Repository<Career>,
-    @InjectRepository(SecondaryOccupation)
-    private occupationRepository: Repository<SecondaryOccupation>,
-    @InjectRepository(JobRank)
-    private jobRankRepository: Repository<JobRank>,
   ) {}
+
+  async findOneWithUser(careerId: number, userId: number) {
+    const career = await this.careerRepository.findOne({
+      where: { id: careerId, user: { id: userId } },
+    });
+    return career;
+  }
+
+  /* 
+    method for resume
+  */
+  async updateVisibility(userId: number, body: any) {
+    const career = await this.findOneWithUser(body.careerId, userId);
+    career.isInclude = body.isInclude;
+    await this.careerRepository.save(career);
+    return career;
+  }
+
+  async getAllResume(userId: number) {
+    const careers = await this.careerRepository.find({
+      where: { user: { id: userId }, isInclude: true },
+    });
+    return careers;
+  }
+
+  /* 
+    method for share link
+  */
+  async updateShareLinkVisibility(userId: number, body: any) {
+    const career = await this.findOneWithUser(body.careerId, userId);
+    career.isPublic = body.isPublic;
+    await this.careerRepository.save(career);
+    return career;
+  }
+
+  async getAllShareLink(userId: number) {
+    const careers = await this.careerRepository.find({
+      where: { user: { id: userId }, isPublic: true },
+    });
+    return careers;
+  }
 
   async findAll(userId: number, take: number, page: number) {
     const [careers, total] = await this.careerRepository.findAndCount({
@@ -24,7 +59,6 @@ export class CareerService {
       order: { startAt: 'DESC' },
       take,
       skip: (page - 1) * take,
-      relations: ['occupation', 'jobRank'],
     });
 
     let totalCareerYears = 0;
@@ -59,7 +93,6 @@ export class CareerService {
   async findOne(careerId: number, userId: number) {
     const career = await this.careerRepository.findOne({
       where: { id: careerId, user: { id: userId } },
-      relations: ['occupation', 'jobRank'],
     });
 
     if (!career) {
@@ -70,21 +103,8 @@ export class CareerService {
   }
 
   async create(createCareerDto: CreateCareerDto, userId: number) {
-    const occupation = await this.occupationRepository.findOne({
-      where: { id: createCareerDto.occupationId },
-    });
-    const jobRank = await this.jobRankRepository.findOne({
-      where: { id: createCareerDto.jobRankId },
-    });
-
-    if (!occupation || !jobRank) {
-      throw new BadRequestException('Invalid occupation or job rank');
-    }
-
     const career = this.careerRepository.create({
       ...createCareerDto,
-      occupation,
-      jobRank,
       user: { id: userId },
     });
 
@@ -97,26 +117,6 @@ export class CareerService {
     userId: number,
   ) {
     const career = await this.findOne(careerId, userId);
-
-    if (updateCareerDto.occupationId) {
-      const occupation = await this.occupationRepository.findOne({
-        where: { id: updateCareerDto.occupationId },
-      });
-      if (!occupation) {
-        throw new BadRequestException('Invalid occupation');
-      }
-      career.occupation = occupation;
-    }
-
-    if (updateCareerDto.jobRankId) {
-      const jobRank = await this.jobRankRepository.findOne({
-        where: { id: updateCareerDto.jobRankId },
-      });
-      if (!jobRank) {
-        throw new BadRequestException('Invalid job rank');
-      }
-      career.jobRank = jobRank;
-    }
 
     Object.assign(career, updateCareerDto);
 

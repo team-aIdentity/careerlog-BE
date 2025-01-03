@@ -19,6 +19,34 @@ import { JwtAccessAuthGuard } from 'src/auth/jwt/jwtAccessAuth.guard';
 export class AcademicController {
   constructor(private readonly academicService: AcademicService) {}
 
+  /* 
+    method for resume
+  */
+  @Put('update/visibility')
+  @UseGuards(JwtAccessAuthGuard)
+  async updateVisibility(@Req() req: any, @Body() body: any) {
+    return this.academicService.updateVisibility(req.user.id, body);
+  }
+
+  @Get('resume/all/:userId')
+  async getAllResume(@Param('userId') userId: number) {
+    return this.academicService.getAllResume(userId);
+  }
+
+  /* 
+    method for share link
+  */
+  @Put('share-link/visibility')
+  @UseGuards(JwtAccessAuthGuard)
+  async updateShareLinkVisibility(@Req() req: any, @Body() body: any) {
+    return this.academicService.updateShareLinkVisibility(req.user.id, body);
+  }
+
+  @Get('share-link/all/:userId')
+  async getAllShareLink(@Param('userId') userId: number) {
+    return this.academicService.getAllShareLink(userId);
+  }
+
   @Get()
   @UseGuards(JwtAccessAuthGuard)
   async findAll(

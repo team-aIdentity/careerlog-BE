@@ -1,4 +1,3 @@
-import { SecondaryOccupation } from 'src/career/entity/secondaryOccupation.entity';
 import { User } from 'src/user/entity/user.entity';
 import {
   Column,
@@ -8,7 +7,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { JobRank } from './jobRank.entity';
 
 @Entity()
 export class Career {
@@ -30,21 +28,14 @@ export class Career {
   @Column({ nullable: true })
   endAt: Date;
 
-  @Column({ nullable: true, type: 'int', default: null })
-  totalYear: number;
-
   @Column({ nullable: false, default: false })
   isCurrent: boolean;
 
-  @ManyToOne(
-    () => SecondaryOccupation,
-    (secondaryOccupation) => secondaryOccupation.careers,
-  )
-  occupation: SecondaryOccupation;
+  @Column({ nullable: false, default: true })
+  isPublic: boolean;
 
-  @ManyToOne(() => JobRank, (jobRank) => jobRank.careers)
-  jobRank: JobRank;
-
+  @Column({ nullable: false, default: false })
+  isInclude: boolean;
   @ManyToOne(() => User, (user) => user.careers)
   user: User;
 
