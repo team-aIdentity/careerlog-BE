@@ -400,7 +400,6 @@ export class UserService {
       responseDto.address,
       responseDto.expectedSalary,
       responseDto.careerGoal,
-      responseDto.image,
       responseDto.primaryOccupationId,
       responseDto.secondaryOccupationId,
     ].every((value) => value !== undefined && value !== null);
