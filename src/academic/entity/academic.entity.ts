@@ -34,6 +34,9 @@ export class Academic {
   @Column({ nullable: false, default: true })
   isPublic: boolean;
 
+  @Column({ nullable: false, default: false })
+  isInclude: boolean;
+
   @ManyToOne(() => User, (user) => user.academics)
   user: User;
 
