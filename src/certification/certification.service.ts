@@ -12,6 +12,54 @@ export class CertificationService {
     private certificationRepository: Repository<Certification>,
   ) {}
 
+  async findOneWithUser(certificationId: number, userId: number) {
+    const certification = await this.certificationRepository.findOne({
+      where: { id: certificationId, user: { id: userId } },
+      relations: ['user', 'user.profile'],
+    });
+    return certification;
+  }
+
+  /* 
+    method for resume
+  */
+  async updateVisibility(userId: number, body: any) {
+    const certification = await this.findOneWithUser(
+      body.certificationId,
+      userId,
+    );
+    certification.isInclude = body.isInclude;
+    await this.certificationRepository.save(certification);
+    return certification;
+  }
+
+  async getAllResume(userId: number) {
+    const certifications = await this.certificationRepository.find({
+      where: { user: { id: userId }, isInclude: true },
+    });
+    return certifications;
+  }
+
+  /* 
+    method for share link
+  */
+  async updateShareLinkVisibility(userId: number, body: any) {
+    const certification = await this.findOneWithUser(
+      body.certificationId,
+      userId,
+    );
+    certification.isPublic = body.isPublic;
+    await this.certificationRepository.save(certification);
+    return certification;
+  }
+
+  async getAllShareLink(userId: number) {
+    const certifications = await this.certificationRepository.find({
+      where: { user: { id: userId }, isPublic: true },
+    });
+    return certifications;
+  }
+
   async findAll(userId: number): Promise<Certification[]> {
     return await this.certificationRepository.find({
       where: { user: { id: userId } },

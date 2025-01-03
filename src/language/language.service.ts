@@ -19,6 +19,45 @@ export class LanguageService {
     });
   }
 
+  async findOneWithUser(languageId: number, userId: number) {
+    const language = await this.languageRepository.findOne({
+      where: { id: languageId, user: { id: userId } },
+      relations: ['user', 'user.profile'],
+    });
+    return language;
+  }
+
+  /*
+    method for resume
+  */
+  async updateVisibility(userId: number, body: any) {
+    const language = await this.findOneWithUser(body.languageId, userId);
+    language.isInclude = body.isInclude;
+    await this.languageRepository.save(language);
+    return language;
+  }
+
+  async getAllResume(userId: number) {
+    const languages = await this.languageRepository.find({
+      where: { user: { id: userId }, isInclude: true },
+    });
+    return languages;
+  }
+
+  async updateShareLinkVisibility(userId: number, body: any) {
+    const language = await this.findOneWithUser(body.languageId, userId);
+    language.isPublic = body.isPublic;
+    await this.languageRepository.save(language);
+    return language;
+  }
+
+  async getAllShareLink(userId: number) {
+    const languages = await this.languageRepository.find({
+      where: { user: { id: userId }, isPublic: true },
+    });
+    return languages;
+  }
+
   async findOne(id: number, userId: number): Promise<Language> {
     const language = await this.languageRepository.findOne({
       where: { id, user: { id: userId } },

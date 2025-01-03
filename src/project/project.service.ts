@@ -12,6 +12,48 @@ export class ProjectService {
     private projectRepository: Repository<Project>,
   ) {}
 
+  async findOneWithUser(projectId: number, userId: number) {
+    const project = await this.projectRepository.findOne({
+      where: { id: projectId, user: { id: userId } },
+      relations: ['user', 'user.profile'],
+    });
+    return project;
+  }
+
+  /*
+    method for resume
+  */
+  async updateVisibility(userId: number, body: any) {
+    const project = await this.findOneWithUser(body.projectId, userId);
+    project.isInclude = body.isInclude;
+    await this.projectRepository.save(project);
+    return project;
+  }
+
+  async getAllResume(userId: number) {
+    const projects = await this.projectRepository.find({
+      where: { user: { id: userId }, isInclude: true },
+    });
+    return projects;
+  }
+
+  /*
+    method for share link
+  */
+  async updateShareLinkVisibility(userId: number, body: any) {
+    const project = await this.findOneWithUser(body.projectId, userId);
+    project.isPublic = body.isPublic;
+    await this.projectRepository.save(project);
+    return project;
+  }
+
+  async getAllShareLink(userId: number) {
+    const projects = await this.projectRepository.find({
+      where: { user: { id: userId }, isPublic: true },
+    });
+    return projects;
+  }
+
   async findAll(userId: number, take: number, page: number) {
     const [projects, total] = await this.projectRepository.findAndCount({
       where: { user: { id: userId } },

@@ -12,6 +12,48 @@ export class SkillService {
     private skillRepository: Repository<Skill>,
   ) {}
 
+  async findOneWithUser(skillId: number, userId: number) {
+    const skill = await this.skillRepository.findOne({
+      where: { id: skillId, user: { id: userId } },
+      relations: ['user', 'user.profile'],
+    });
+    return skill;
+  }
+
+  /*
+    method for resume
+  */
+  async updateVisibility(userId: number, body: any) {
+    const skill = await this.findOneWithUser(body.skillId, userId);
+    skill.isInclude = body.isInclude;
+    await this.skillRepository.save(skill);
+    return skill;
+  }
+
+  async getAllResume(userId: number) {
+    const skills = await this.skillRepository.find({
+      where: { user: { id: userId }, isInclude: true },
+    });
+    return skills;
+  }
+
+  /*
+    method for share link
+  */
+  async updateShareLinkVisibility(userId: number, body: any) {
+    const skill = await this.findOneWithUser(body.skillId, userId);
+    skill.isPublic = body.isPublic;
+    await this.skillRepository.save(skill);
+    return skill;
+  }
+
+  async getAllShareLink(userId: number) {
+    const skills = await this.skillRepository.find({
+      where: { user: { id: userId }, isPublic: true },
+    });
+    return skills;
+  }
+
   async findAll(userId: number): Promise<Skill[]> {
     return await this.skillRepository.find({
       where: { user: { id: userId } },

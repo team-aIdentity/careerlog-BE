@@ -12,6 +12,47 @@ export class ActivityService {
     private activityRepository: Repository<Activity>,
   ) {}
 
+  async findOneWithUser(activityId: number, userId: number) {
+    const activity = await this.activityRepository.findOne({
+      where: { id: activityId, user: { id: userId } },
+    });
+    return activity;
+  }
+
+  /* 
+    method for resume
+  */
+  async updateVisibility(userId: number, body: any) {
+    const activity = await this.findOneWithUser(body.activityId, userId);
+    activity.isInclude = body.isInclude;
+    await this.activityRepository.save(activity);
+    return activity;
+  }
+
+  async getAllResume(userId: number) {
+    const activities = await this.activityRepository.find({
+      where: { user: { id: userId }, isInclude: true },
+    });
+    return activities;
+  }
+
+  /* 
+    method for share link
+  */
+  async updateShareLinkVisibility(userId: number, body: any) {
+    const activity = await this.findOneWithUser(body.activityId, userId);
+    activity.isPublic = body.isPublic;
+    await this.activityRepository.save(activity);
+    return activity;
+  }
+
+  async getAllShareLink(userId: number) {
+    const activities = await this.activityRepository.find({
+      where: { user: { id: userId }, isPublic: true },
+    });
+    return activities;
+  }
+
   async findAll(userId: number, take: number, page: number) {
     const [activities, total] = await this.activityRepository.findAndCount({
       where: { user: { id: userId } },

@@ -12,6 +12,47 @@ export class AcademicService {
     private academicRepository: Repository<Academic>,
   ) {}
 
+  async findOneWithUser(academicId: number, userId: number) {
+    const academic = await this.academicRepository.findOne({
+      where: { id: academicId, user: { id: userId } },
+    });
+    return academic;
+  }
+
+  /* 
+    method for resume
+  */
+  async updateVisibility(userId: number, body: any) {
+    const academic = await this.findOneWithUser(body.academicId, userId);
+    academic.isInclude = body.isInclude;
+    await this.academicRepository.save(academic);
+    return academic;
+  }
+
+  async getAllResume(userId: number) {
+    const academics = await this.academicRepository.find({
+      where: { user: { id: userId }, isInclude: true },
+    });
+    return academics;
+  }
+
+  /* 
+    method for share link
+  */
+  async updateShareLinkVisibility(userId: number, body: any) {
+    const academic = await this.findOneWithUser(body.academicId, userId);
+    academic.isPublic = body.isPublic;
+    await this.academicRepository.save(academic);
+    return academic;
+  }
+
+  async getAllShareLink(userId: number) {
+    const academics = await this.academicRepository.find({
+      where: { user: { id: userId }, isPublic: true },
+    });
+    return academics;
+  }
+
   async findAll(userId: number, take: number, page: number) {
     const [academics, total] = await this.academicRepository.findAndCount({
       where: { user: { id: userId } },

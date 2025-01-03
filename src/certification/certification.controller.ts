@@ -18,6 +18,37 @@ import { JwtAccessAuthGuard } from 'src/auth/jwt/jwtAccessAuth.guard';
 export class CertificationController {
   constructor(private readonly certificationService: CertificationService) {}
 
+  /*
+    method for resume
+  */
+  @Put('update/visibility')
+  @UseGuards(JwtAccessAuthGuard)
+  async updateVisibility(@Req() req: any, @Body() body: any) {
+    return this.certificationService.updateVisibility(req.user.id, body);
+  }
+
+  @Get('resume/all/:userId')
+  async getAllResume(@Param('userId') userId: number) {
+    return this.certificationService.getAllResume(userId);
+  }
+
+  /*
+    method for share link
+  */
+  @Put('share-link/visibility')
+  @UseGuards(JwtAccessAuthGuard)
+  async updateShareLinkVisibility(@Req() req: any, @Body() body: any) {
+    return this.certificationService.updateShareLinkVisibility(
+      req.user.id,
+      body,
+    );
+  }
+
+  @Get('share-link/all/:userId')
+  async getAllShareLink(@Param('userId') userId: number) {
+    return this.certificationService.getAllShareLink(userId);
+  }
+
   @Get()
   @UseGuards(JwtAccessAuthGuard)
   async findAll(@Req() req: any) {
