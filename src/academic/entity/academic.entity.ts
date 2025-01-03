@@ -31,6 +31,9 @@ export class Academic {
   @Column({ nullable: true })
   endAt: string;
 
+  @Column({ nullable: false, default: true })
+  isPublic: boolean;
+
   @ManyToOne(() => User, (user) => user.academics)
   user: User;
 

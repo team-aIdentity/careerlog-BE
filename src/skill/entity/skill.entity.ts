@@ -19,6 +19,12 @@ export class Skill {
   @Column({ nullable: false })
   type: string;
 
+  @Column({ nullable: false, default: true })
+  isPublic: boolean;
+
+  @Column({ nullable: false, default: false })
+  isInclude: boolean;
+
   @ManyToOne(() => User, (user) => user.skills)
   user: User;
 

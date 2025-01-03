@@ -37,6 +37,12 @@ export class Project {
   @Column({ nullable: false })
   satisfaction: number;
 
+  @Column({ nullable: false, default: true })
+  isPublic: boolean;
+
+  @Column({ nullable: false, default: false })
+  isInclude: boolean;
+
   @ManyToOne(() => User, (user) => user.projects)
   user: User;
 

@@ -34,6 +34,12 @@ export class User {
   @Column({ nullable: false, unique: true, update: false })
   email: string;
 
+  @Column({ nullable: false, default: true })
+  isEmailPublic: boolean;
+
+  @Column({ nullable: false, default: false })
+  isEmailInclude: boolean;
+
   @Column({ nullable: true, select: false })
   password: string;
 

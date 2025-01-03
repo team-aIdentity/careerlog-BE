@@ -28,6 +28,12 @@ export class Activity {
   @Column({ nullable: true })
   endAt: string;
 
+  @Column({ nullable: false, default: true })
+  isPublic: boolean;
+
+  @Column({ nullable: false, default: false })
+  isInclude: boolean;
+
   @ManyToOne(() => User, (user) => user.activities)
   user: User;
 

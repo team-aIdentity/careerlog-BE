@@ -19,6 +19,12 @@ export class Language {
   @Column({ nullable: false })
   level: string;
 
+  @Column({ nullable: false, default: true })
+  isPublic: boolean;
+
+  @Column({ nullable: false, default: false })
+  isInclude: boolean;
+
   @ManyToOne(() => User, (user) => user.languages)
   user: User;
 

@@ -45,6 +45,173 @@ export class UserService {
     private secondaryOccupationRepository: Repository<SecondaryOccupation>,
   ) {}
 
+  async findOneWithProfile(userId: number) {
+    return await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['profile', 'profile.job'],
+    });
+  }
+
+  // methods for resume
+
+  async updateResumeNameVisibility(userId: number, body: any) {
+    const user = await this.findOneWithProfile(userId);
+    user.profile.isNameInclude = body.isInclude;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async updateResumeJobVisibility(userId: number, body: any) {
+    const user = await this.findOneWithProfile(userId);
+    user.profile.isJobInclude = body.isInclude;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async updateResumeEmailVisibility(userId: number, body: any) {
+    const user = await this.findOne(userId);
+    user.isEmailInclude = body.isInclude;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async updateResumePhoneVisibility(userId: number, body: any) {
+    const user = await this.findOneWithProfile(userId);
+    user.profile.isPhoneInclude = body.isInclude;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async updateResumeAddressVisibility(userId: number, body: any) {
+    const user = await this.findOneWithProfile(userId);
+    user.profile.isAddressInclude = body.isInclude;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async updateResumeCoreAbility(userId: number, body: any) {
+    const user = await this.findOneWithProfile(userId);
+    user.profile.coreAbility = body.coreAbility;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async updateResumeCoreAbilityVisibility(userId: number, body: any) {
+    const user = await this.findOneWithProfile(userId);
+    user.profile.isCoreAbilityInclude = body.isInclude;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async getResume(userId: number) {
+    const user = await this.findOneWithProfile(userId);
+
+    const responseDto = {
+      name: user.profile.isNameInclude ? user.profile.name : null,
+      job: user.profile.isJobInclude ? user.profile.job.name : null,
+      email: user.isEmailInclude ? user.email : null,
+      phone: user.profile.isPhoneInclude ? user.profile.phone : null,
+      address: user.profile.isAddressInclude ? user.profile.address : null,
+      coreAbility: user.profile.isCoreAbilityInclude
+        ? user.profile.coreAbility
+        : null,
+    };
+
+    return responseDto;
+  }
+
+  // methods for share link
+
+  async updateShareLinkNameVisibility(userId: number, body: any) {
+    const user = await this.findOneWithProfile(userId);
+    user.profile.isNamePublic = body.isPublic;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async updateShareLinkJobVisibility(userId: number, body: any) {
+    const user = await this.findOneWithProfile(userId);
+    user.profile.isJobPublic = body.isPublic;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async updateShareLinkEmailVisibility(userId: number, body: any) {
+    const user = await this.findOneWithProfile(userId);
+    user.isEmailPublic = body.isPublic;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async updateShareLinkPhoneVisibility(userId: number, body: any) {
+    const user = await this.findOneWithProfile(userId);
+    user.profile.isPhonePublic = body.isPublic;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async updateShareLinkAddressVisibility(userId: number, body: any) {
+    const user = await this.findOneWithProfile(userId);
+    user.profile.isAddressPublic = body.isPublic;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async updateShareLink(userId: number, body: any) {
+    const user = await this.findOneWithProfile(userId);
+    user.profile.isShareLink = body.isShareLink;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async updateShareLinkIntroduction(userId: number, body: any) {
+    const user = await this.findOneWithProfile(userId);
+    user.profile.introductionTitle = body.title;
+    user.profile.introductionContent = body.content;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async updateShareLinkIntroductionTitleVisibility(userId: number, body: any) {
+    const user = await this.findOneWithProfile(userId);
+    user.profile.isIntroductionTitlePublic = body.isPublic;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async updateShareLinkIntroductionContentVisibility(
+    userId: number,
+    body: any,
+  ) {
+    const user = await this.findOneWithProfile(userId);
+    user.profile.isIntroductionContentPublic = body.isPublic;
+    await this.userRepository.save(user);
+    return user;
+  }
+
+  async getShareLink(userId: number) {
+    const user = await this.findOneWithProfile(userId);
+    const responseDto = {
+      name: user.profile.isNamePublic ? user.profile.name : null,
+      job: user.profile.isJobPublic ? user.profile.job.name : null,
+      email: user.isEmailPublic ? user.email : null,
+      phone: user.profile.isPhonePublic ? user.profile.phone : null,
+      address: user.profile.isAddressPublic ? user.profile.address : null,
+      introductionTitle: user.profile.isIntroductionTitlePublic
+        ? user.profile.introductionTitle
+        : null,
+      introductionContent: user.profile.isIntroductionContentPublic
+        ? user.profile.introductionContent
+        : null,
+    };
+    return user.profile.isShareLink
+      ? responseDto
+      : {
+          message: '공유링크가 비공개로 설정되어 있습니다.',
+          code: 404,
+        };
+  }
+
   // user feature
 
   async findAll(take: number, page: number): Promise<any> {

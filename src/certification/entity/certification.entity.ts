@@ -22,6 +22,12 @@ export class Certification {
   @Column({ nullable: false })
   jurisdiction: string;
 
+  @Column({ nullable: false, default: true })
+  isPublic: boolean;
+
+  @Column({ nullable: false, default: false })
+  isInclude: boolean;
+
   @ManyToOne(() => User, (user) => user.certifications)
   user: User;
 
