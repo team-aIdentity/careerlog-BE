@@ -33,13 +33,5 @@ export class UpdateCareerDto {
 
   @IsInt()
   @IsOptional()
-  totalYear: number;
-
-  @IsInt()
-  @IsOptional()
-  occupationId: number;
-
-  @IsInt()
-  @IsOptional()
   jobRankId: number;
 }

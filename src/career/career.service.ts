@@ -4,12 +4,15 @@ import { Repository } from 'typeorm';
 import { Career } from './entity/career.entity';
 import { CreateCareerDto } from './dto/createCareer.dto';
 import { UpdateCareerDto } from './dto/updateCareer.dto';
+import { JobRank } from './entity/jobRank.entity';
 
 @Injectable()
 export class CareerService {
   constructor(
     @InjectRepository(Career)
     private careerRepository: Repository<Career>,
+    @InjectRepository(JobRank)
+    private jobRankRepository: Repository<JobRank>,
   ) {}
 
   async findOneWithUser(careerId: number, userId: number) {
@@ -108,10 +111,20 @@ export class CareerService {
   }
 
   async create(createCareerDto: CreateCareerDto, userId: number) {
+    const jobRank = await this.jobRankRepository.findOne({
+      where: { id: createCareerDto.jobRankId },
+    });
+    if (!jobRank) {
+      throw new BadRequestException('Job rank not found');
+    }
+
     const career = this.careerRepository.create({
       ...createCareerDto,
       user: { id: userId },
+      jobRank,
     });
+
+    console.log(career);
 
     return await this.careerRepository.save(career);
   }
@@ -122,6 +135,16 @@ export class CareerService {
     userId: number,
   ) {
     const career = await this.findOne(careerId, userId);
+
+    const jobRank = await this.jobRankRepository.findOne({
+      where: { id: updateCareerDto.jobRankId },
+    });
+
+    if (!jobRank) {
+      throw new BadRequestException('Job rank not found');
+    }
+
+    career.jobRank = jobRank;
 
     Object.assign(career, updateCareerDto);
 

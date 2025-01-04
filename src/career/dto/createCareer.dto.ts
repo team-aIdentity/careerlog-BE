@@ -27,12 +27,5 @@ export class CreateCareerDto {
   endAt: string;
 
   @IsInt()
-  @IsOptional()
-  totalYear: number;
-
-  @IsInt()
-  occupationId: number;
-
-  @IsInt()
   jobRankId: number;
 }
