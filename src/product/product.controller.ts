@@ -11,6 +11,15 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { ProductService } from './product.service';
 import { Response } from 'express';
 import { JwtAccessAuthGuard } from 'src/auth/jwt/jwtAccessAuth.guard';
@@ -20,12 +29,22 @@ import { UpdateProductDto } from './dto/updateProduct.dto';
 import { CreateProductCategoryDto } from './dto/createProductCategory.dto';
 import { UpdateProductCategoryDto } from './dto/updateProductCategory.dto';
 
+@ApiTags('product')
+@ApiBearerAuth() // If you are using JWT authentication
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get('all')
   @UseGuards(JwtAccessAuthGuard2)
+  @ApiOperation({ summary: 'Get all products' })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    description: 'Number of products per page',
+  })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number' })
+  @ApiResponse({ status: 200, description: 'List of all products.' })
   async getAllProducts(
     @Req() req: any,
     @Query('pageSize') pageSize: number,
@@ -48,6 +67,14 @@ export class ProductController {
 
   @Get('my')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Get my products' })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    description: 'Number of products per page',
+  })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number' })
+  @ApiResponse({ status: 200, description: 'List of my products.' })
   async getMyProducts(
     @Req() req: any,
     @Query('pageSize') pageSize: number,
@@ -62,6 +89,14 @@ export class ProductController {
 
   @Get('cart/all')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Get all items in my cart' })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    description: 'Number of items per page',
+  })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number' })
+  @ApiResponse({ status: 200, description: 'List of all items in my cart.' })
   async getMyAllCart(
     @Req() req: any,
     @Query('pageSize') pageSize: number,
@@ -72,6 +107,17 @@ export class ProductController {
 
   @Get('cart/before')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Get items in my cart before a certain date' })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    description: 'Number of items per page',
+  })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of items in my cart before a certain date.',
+  })
   async getMyBeforeCart(
     @Req() req: any,
     @Query('pageSize') pageSize: number,
@@ -82,6 +128,17 @@ export class ProductController {
 
   @Get('cart/after')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Get items in my cart after a certain date' })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    description: 'Number of items per page',
+  })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of items in my cart after a certain date.',
+  })
   async getMyAfterCart(
     @Req() req: any,
     @Query('pageSize') pageSize: number,
@@ -91,12 +148,32 @@ export class ProductController {
   }
 
   @Get('category/all')
+  @ApiOperation({ summary: 'Get all product categories' })
+  @ApiResponse({ status: 200, description: 'List of all product categories.' })
   async getAllArticleCategory() {
     return await this.productService.findAllCategories();
   }
 
   @Post('category')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Create a new product category' })
+  @ApiBody({
+    description: 'Product category creation payload',
+    type: CreateProductCategoryDto,
+    examples: {
+      example1: {
+        summary: 'Example payload',
+        value: {
+          name: 'Electronics',
+          description: 'Category for electronic products',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Product category created successfully.',
+  })
   async createCategory(
     @Req() req: any,
     @Body() createProductCategoryDto: CreateProductCategoryDto,
@@ -110,6 +187,25 @@ export class ProductController {
 
   @Put('category/:id')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Update an existing product category' })
+  @ApiParam({ name: 'id', description: 'Category ID' })
+  @ApiBody({
+    description: 'Product category update payload',
+    type: UpdateProductCategoryDto,
+    examples: {
+      example1: {
+        summary: 'Example payload',
+        value: {
+          name: 'Updated Electronics',
+          description: 'Updated category for electronic products',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Product category updated successfully.',
+  })
   async updateCategory(
     @Req() req: any,
     @Body() updateProductCategoryDto: UpdateProductCategoryDto,
@@ -125,6 +221,16 @@ export class ProductController {
 
   @Delete('category/:id')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Delete a product category' })
+  @ApiParam({ name: 'id', description: 'Category ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product category deleted successfully.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Failed to delete product category.',
+  })
   async deleteCategory(
     @Req() req: any,
     @Param('id') categoryId: number,
@@ -146,6 +252,14 @@ export class ProductController {
 
   @Get('saved')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Get saved products' })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    description: 'Number of products per page',
+  })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number' })
+  @ApiResponse({ status: 200, description: 'List of saved products.' })
   async getSavedProduct(
     @Req() req: any,
     @Query('pageSize') pageSize: number,
@@ -160,6 +274,9 @@ export class ProductController {
 
   @Get(':id')
   @UseGuards(JwtAccessAuthGuard2)
+  @ApiOperation({ summary: 'Get product by ID' })
+  @ApiParam({ name: 'id', description: 'Product ID' })
+  @ApiResponse({ status: 200, description: 'Product details.' })
   async getProductById(
     @Req() req: any,
     @Param('id') productId: number,
@@ -194,12 +311,32 @@ export class ProductController {
   }
 
   @Get('search/:keyword')
+  @ApiOperation({ summary: 'Search products by keyword' })
+  @ApiParam({ name: 'keyword', description: 'Search keyword' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of products matching the keyword.',
+  })
   async searchProduct(@Param('keyword') keyword: string) {
     return await this.productService.findWithKeyword(keyword);
   }
 
   @Post('my')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Create a new product' })
+  @ApiBody({
+    description: 'Product creation payload',
+    type: CreateProductDto,
+    examples: {
+      example1: {
+        summary: 'Example payload',
+        value: {
+          name: 'Example Product',
+          description: 'Description of the product',
+        },
+      },
+    },
+  })
   async postProduct(
     @Req() req: any,
     @Body() createProductDto: CreateProductDto,
@@ -209,6 +346,13 @@ export class ProductController {
 
   @Put('my/:id')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Update an existing product' })
+  @ApiParam({ name: 'id', description: 'Product ID' })
+  @ApiBody({
+    description: 'Product update payload',
+    type: UpdateProductDto,
+  })
+  @ApiResponse({ status: 200, description: 'Product updated successfully.' })
   async updateProduct(
     @Req() req: any,
     @Param('id') productId: number,
@@ -223,6 +367,9 @@ export class ProductController {
 
   @Delete('my/:id')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Delete a product' })
+  @ApiParam({ name: 'id', description: 'Product ID' })
+  @ApiResponse({ status: 200, description: 'Product deleted successfully.' })
   async deleteProduct(
     @Req() req: any,
     @Param('id') productId: number,
@@ -243,6 +390,9 @@ export class ProductController {
 
   @Post('save/:id')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Save a product' })
+  @ApiParam({ name: 'id', description: 'Product ID' })
+  @ApiResponse({ status: 200, description: 'Product saved successfully.' })
   async saveProduct(
     @Req() req: any,
     @Param('id') productId: number,
@@ -256,6 +406,14 @@ export class ProductController {
 
   @Get('my/save/all')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Get all saved products' })
+  @ApiQuery({
+    name: 'pageSize',
+    required: false,
+    description: 'Number of products per page',
+  })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number' })
+  @ApiResponse({ status: 200, description: 'List of saved products.' })
   async getAllSavedProduct(
     @Req() req: any,
     @Query('pageSize') pageSize: number,
@@ -270,6 +428,9 @@ export class ProductController {
 
   @Delete('save/:id')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Unsave a product' })
+  @ApiParam({ name: 'id', description: 'Product ID' })
+  @ApiResponse({ status: 200, description: 'Product unsaved successfully.' })
   async unsaveArticle(
     @Req() req: any,
     @Param('id') productId: number,
@@ -293,12 +454,24 @@ export class ProductController {
 
   @Post('cart')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Add a product to cart' })
+  @ApiParam({ name: 'productId', description: 'Product ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product added to cart successfully.',
+  })
   async addCart(@Req() req: any, @Query('productId') productId: number) {
     return await this.productService.addCart(productId, req.user.id);
   }
 
   @Delete('cart')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Remove a product from cart' })
+  @ApiParam({ name: 'productId', description: 'Product ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Product removed from cart successfully.',
+  })
   async removeCart(
     @Req() req: any,
     @Query('productId') productId: number,

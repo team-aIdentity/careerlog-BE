@@ -10,6 +10,13 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+} from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { AuthService } from './auth.service';
 import { UserService } from 'src/user/user.service';
@@ -21,6 +28,7 @@ import { JwtAccessAuthGuard } from './jwt/jwtAccessAuth.guard';
 import { JwtRefreshGuard } from './jwt/jwtRefresh.guard';
 import { KakaoAuthGuard } from './kakao/kakaoAuth.guard';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -29,6 +37,25 @@ export class AuthController {
   ) {}
 
   @Post('login')
+  @ApiOperation({ summary: 'User login' })
+  @ApiBody({
+    description: 'User login payload',
+    type: LoginDto,
+    examples: {
+      example1: {
+        summary: 'Example payload',
+        value: {
+          email: 'user@example.com',
+          password: 'password123',
+          isMobile: true,
+          deviceId: 'device123',
+          isPermanant: true,
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Login successful.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async login(
     @Body() loginDto: LoginDto,
     @Res({ passthrough: true }) res: Response,
@@ -69,6 +96,9 @@ export class AuthController {
 
   @Get('authenticate')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Authenticate user' })
+  @ApiResponse({ status: 200, description: 'User authenticated successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async user(@Req() req: any, @Res() res: Response): Promise<any> {
     const userId: number = req.user.id;
     const verifiedUser: User = await this.userService.findOne(userId);
@@ -76,6 +106,24 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @ApiOperation({ summary: 'Refresh access token' })
+  @ApiBody({
+    description: 'Refresh token payload',
+    type: RefreshTokenDto,
+    examples: {
+      example1: {
+        summary: 'Example payload',
+        value: {
+          refreshToken: 'your-refresh-token',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Access token refreshed successfully.',
+  })
+  @ApiResponse({ status: 401, description: 'Invalid refresh-token.' })
   async refresh(
     @Body() refreshTokenDto: RefreshTokenDto,
     @Res({ passthrough: true }) res: Response,
@@ -97,6 +145,9 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(JwtRefreshGuard)
+  @ApiOperation({ summary: 'User logout' })
+  @ApiResponse({ status: 200, description: 'Logout successful.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async logout(@Req() req: any, @Res() res: Response): Promise<any> {
     await this.userService.removeRefreshToken(req.user.id, req.user.deviceId);
     res.clearCookie('accessToken');
@@ -107,6 +158,22 @@ export class AuthController {
   }
 
   @Post('register')
+  @ApiOperation({ summary: 'User registration' })
+  @ApiBody({
+    description: 'User registration payload',
+    type: RegisterDto,
+    examples: {
+      example1: {
+        summary: 'Example payload',
+        value: {
+          email: 'newuser@example.com',
+          password: 'password123',
+          name: 'New User',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 201, description: 'User registered successfully.' })
   async register(
     @Body() registerDto: RegisterDto,
     @Res({ passthrough: true }) res: Response,
@@ -117,13 +184,18 @@ export class AuthController {
 
   @Get('/kakao')
   @UseGuards(KakaoAuthGuard)
+  @ApiOperation({ summary: 'Kakao login redirect' })
+  @ApiResponse({ status: 301, description: 'Redirect to Kakao login page.' })
   async kakaoLogin1(@Req() req: Request) {
-    // 이 부분은 Passport의 AuthGuard에 의해 카카오 로그인 페이지로 리다이렉트
+    // This part is handled by Passport's AuthGuard to redirect to Kakao login page
   }
 
   @Get('callback/kakao')
   @UseGuards(KakaoAuthGuard)
   @HttpCode(301)
+  @ApiOperation({ summary: 'Kakao login callback' })
+  @ApiResponse({ status: 200, description: 'Kakao login successful.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async kakaoLogin(@Req() req: any, @Res() res: Response) {
     const user = await this.authService.validateKakaoUser(req.user);
     const accessToken = await this.authService.generateAccessToken(user);

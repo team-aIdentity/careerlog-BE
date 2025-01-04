@@ -11,6 +11,15 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiQuery,
+  ApiBody,
+} from '@nestjs/swagger';
 import { JwtAccessAuthGuard } from 'src/auth/jwt/jwtAccessAuth.guard';
 import { ArticleService } from './article.service';
 import { CreateArticleDto } from './dto/createArticle.dto';
@@ -20,12 +29,22 @@ import { CreateArticleCategoryDto } from './dto/createArticleCategory.dto';
 import { UpdateArticleCategoryDto } from './dto/updateArticleCategory.dto';
 import { JwtAccessAuthGuard2 } from 'src/auth/jwt/jwtAccessAuth2.guard';
 
+@ApiTags('article')
+@ApiBearerAuth() // If you are using JWT authentication
 @Controller('article')
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
   @Get('all')
   @UseGuards(JwtAccessAuthGuard2)
+  @ApiOperation({ summary: 'Get all articles' })
+  @ApiQuery({
+    name: 'pageSize',
+    description: 'Number of records per page',
+    required: false,
+  })
+  @ApiQuery({ name: 'page', description: 'Page number', required: false })
+  @ApiResponse({ status: 200, description: 'List of all articles.' })
   async getAllArticles(
     @Req() req: any,
     @Query('pageSize') pageSize: number,
@@ -48,6 +67,14 @@ export class ArticleController {
 
   @Get('my')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Get my articles' })
+  @ApiQuery({
+    name: 'pageSize',
+    description: 'Number of records per page',
+    required: false,
+  })
+  @ApiQuery({ name: 'page', description: 'Page number', required: false })
+  @ApiResponse({ status: 200, description: 'List of my articles.' })
   async getMyArticles(
     @Req() req: any,
     @Query('pageSize') pageSize: number,
@@ -61,12 +88,34 @@ export class ArticleController {
   }
 
   @Get('search/:keyword')
+  @ApiOperation({ summary: 'Search articles by keyword' })
+  @ApiParam({ name: 'keyword', description: 'Search keyword' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of articles matching the keyword.',
+  })
   async searchArticle(@Param('keyword') keyword: string) {
     return await this.articleService.findWithKeyword(keyword);
   }
 
   @Post('my')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Create a new article' })
+  @ApiBody({
+    description: 'Article creation payload',
+    type: CreateArticleDto,
+    examples: {
+      example1: {
+        summary: 'Example payload',
+        value: {
+          title: 'New Article',
+          content: 'This is the content of the new article.',
+          categoryId: 1,
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Article created successfully.' })
   async postArticle(
     @Req() req: any,
     @Body() createArticleDto: CreateArticleDto,
@@ -76,6 +125,23 @@ export class ArticleController {
 
   @Put('my/:id')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Update an existing article' })
+  @ApiParam({ name: 'id', description: 'Article ID' })
+  @ApiBody({
+    description: 'Article update payload',
+    type: UpdateArticleDto,
+    examples: {
+      example1: {
+        summary: 'Example payload',
+        value: {
+          title: 'Updated Article',
+          content: 'This is the updated content of the article.',
+          categoryId: 2,
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Article updated successfully.' })
   async updateArticle(
     @Req() req: any,
     @Param('id') articleId: number,
@@ -90,6 +156,10 @@ export class ArticleController {
 
   @Delete('my/:id')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Delete an article' })
+  @ApiParam({ name: 'id', description: 'Article ID' })
+  @ApiResponse({ status: 200, description: 'Article deleted successfully.' })
+  @ApiResponse({ status: 400, description: 'Delete article failed.' })
   async deleteArticle(
     @Req() req: any,
     @Param('id') articleId: number,
@@ -110,6 +180,14 @@ export class ArticleController {
 
   @Get('saved')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Get saved articles' })
+  @ApiQuery({
+    name: 'pageSize',
+    description: 'Number of records per page',
+    required: false,
+  })
+  @ApiQuery({ name: 'page', description: 'Page number', required: false })
+  @ApiResponse({ status: 200, description: 'List of saved articles.' })
   async getSavedArticle(
     @Req() req: any,
     @Query('pageSize') pageSize: number,
@@ -124,6 +202,9 @@ export class ArticleController {
 
   @Post('save/:id')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Save an article' })
+  @ApiParam({ name: 'id', description: 'Article ID' })
+  @ApiResponse({ status: 200, description: 'Article saved successfully.' })
   async saveArticle(
     @Req() req: any,
     @Param('id') articleId: number,
@@ -137,6 +218,10 @@ export class ArticleController {
 
   @Delete('save/:id')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Unsave an article' })
+  @ApiParam({ name: 'id', description: 'Article ID' })
+  @ApiResponse({ status: 200, description: 'Article unsaved successfully.' })
+  @ApiResponse({ status: 400, description: 'Unsave article failed.' })
   async unsaveArticle(
     @Req() req: any,
     @Param('id') articleId: number,
@@ -159,12 +244,31 @@ export class ArticleController {
   }
 
   @Get('category/all')
+  @ApiOperation({ summary: 'Get all article categories' })
+  @ApiResponse({ status: 200, description: 'List of all article categories.' })
   async getAllArticleCategory() {
     return await this.articleService.findAllCategories();
   }
 
   @Post('category')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Create a new article category' })
+  @ApiBody({
+    description: 'Article category creation payload',
+    type: CreateArticleCategoryDto,
+    examples: {
+      example1: {
+        summary: 'Example payload',
+        value: {
+          name: 'New Category',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Article category created successfully.',
+  })
   async createCategory(
     @Req() req: any,
     @Body() createArticleCategoryDto: CreateArticleCategoryDto,
@@ -178,6 +282,24 @@ export class ArticleController {
 
   @Put('category/:id')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Update an article category' })
+  @ApiParam({ name: 'id', description: 'Category ID' })
+  @ApiBody({
+    description: 'Article category update payload',
+    type: UpdateArticleCategoryDto,
+    examples: {
+      example1: {
+        summary: 'Example payload',
+        value: {
+          name: 'Updated Category',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Article category updated successfully.',
+  })
   async updateCategory(
     @Req() req: any,
     @Body() updateArticleCategoryDto: UpdateArticleCategoryDto,
@@ -193,6 +315,16 @@ export class ArticleController {
 
   @Delete('category/:id')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Delete an article category' })
+  @ApiParam({ name: 'id', description: 'Category ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Article category deleted successfully.',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Delete article category failed.',
+  })
   async deleteCategory(
     @Req() req: any,
     @Param('id') categoryId: number,
@@ -214,6 +346,9 @@ export class ArticleController {
 
   @Get(':id')
   @UseGuards(JwtAccessAuthGuard2)
+  @ApiOperation({ summary: 'Get an article by ID' })
+  @ApiParam({ name: 'id', description: 'Article ID' })
+  @ApiResponse({ status: 200, description: 'Article details.' })
   async getArticleById(
     @Req() req: any,
     @Param('id') articleId: number,

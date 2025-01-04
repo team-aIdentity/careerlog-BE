@@ -15,15 +15,16 @@ export class CareerService {
   async findOneWithUser(careerId: number, userId: number) {
     const career = await this.careerRepository.findOne({
       where: { id: careerId, user: { id: userId } },
+      relations: ['jobRank', 'user'],
     });
     return career;
   }
 
-  /* 
-    method for resume
-  */
   async updateVisibility(userId: number, body: any) {
     const career = await this.findOneWithUser(body.careerId, userId);
+    if (!career) {
+      throw new BadRequestException('Career not found');
+    }
     career.isInclude = body.isInclude;
     await this.careerRepository.save(career);
     return career;
@@ -32,15 +33,16 @@ export class CareerService {
   async getAllResume(userId: number) {
     const careers = await this.careerRepository.find({
       where: { user: { id: userId }, isInclude: true },
+      relations: ['jobRank'],
     });
     return careers;
   }
 
-  /* 
-    method for share link
-  */
   async updateShareLinkVisibility(userId: number, body: any) {
     const career = await this.findOneWithUser(body.careerId, userId);
+    if (!career) {
+      throw new BadRequestException('Career not found');
+    }
     career.isPublic = body.isPublic;
     await this.careerRepository.save(career);
     return career;
@@ -49,6 +51,7 @@ export class CareerService {
   async getAllShareLink(userId: number) {
     const careers = await this.careerRepository.find({
       where: { user: { id: userId }, isPublic: true },
+      relations: ['jobRank'],
     });
     return careers;
   }
@@ -59,6 +62,7 @@ export class CareerService {
       order: { startAt: 'DESC' },
       take,
       skip: (page - 1) * take,
+      relations: ['jobRank'],
     });
 
     let totalCareerYears = 0;
@@ -93,6 +97,7 @@ export class CareerService {
   async findOne(careerId: number, userId: number) {
     const career = await this.careerRepository.findOne({
       where: { id: careerId, user: { id: userId } },
+      relations: ['jobRank', 'user'],
     });
 
     if (!career) {

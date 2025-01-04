@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { JobRank } from './jobRank.entity';
 
 @Entity()
 export class Career {
@@ -36,6 +37,10 @@ export class Career {
 
   @Column({ nullable: false, default: false })
   isInclude: boolean;
+
+  @ManyToOne(() => JobRank, (jobRank) => jobRank.careers)
+  jobRank: JobRank;
+
   @ManyToOne(() => User, (user) => user.careers)
   user: User;
 
