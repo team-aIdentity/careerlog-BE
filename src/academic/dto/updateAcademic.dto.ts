@@ -1,12 +1,11 @@
-import { IsOptional, IsBoolean } from 'class-validator';
+import { IsOptional } from 'class-validator';
 
 export class UpdateAcademicDto {
   @IsOptional()
   kind: string;
 
-  @IsBoolean()
   @IsOptional()
-  isGraduated: boolean;
+  status: string;
 
   @IsOptional()
   name: string;

@@ -1,12 +1,11 @@
-import { IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateAcademicDto {
   @IsNotEmpty()
   kind: string;
 
-  @IsBoolean()
-  @IsOptional()
-  isGraduated: boolean;
+  @IsNotEmpty()
+  status: string;
 
   @IsNotEmpty()
   name: string;

@@ -16,8 +16,8 @@ export class Academic {
   @Column({ nullable: false })
   kind: string;
 
-  @Column({ nullable: false, default: false })
-  isGraduated: boolean;
+  @Column({ nullable: false, default: '재학중' })
+  status: string;
 
   @Column({ nullable: false })
   name: string;

@@ -130,12 +130,12 @@ export class AcademicController {
       example1: {
         summary: 'Example payload',
         value: {
-          kind: 'Bachelor',
-          isGraduated: true,
-          name: 'University of Example',
-          major: 'Computer Science',
-          startAt: '2020-01-01',
-          endAt: '2024-01-01',
+          kind: 'Master',
+          status: '졸업',
+          name: 'Example Institute',
+          major: 'Data Science',
+          startAt: '2024-01-01',
+          endAt: '2026-01-01',
         },
       },
     },
@@ -160,7 +160,7 @@ export class AcademicController {
         summary: 'Example payload',
         value: {
           kind: 'Master',
-          isGraduated: false,
+          status: '졸업',
           name: 'Example Institute',
           major: 'Data Science',
           startAt: '2024-01-01',
