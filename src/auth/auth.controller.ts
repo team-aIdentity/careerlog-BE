@@ -96,6 +96,7 @@ export class AuthController {
 
   @Get('authenticate')
   @UseGuards(JwtAccessAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Authenticate user' })
   @ApiResponse({ status: 200, description: 'User authenticated successfully.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
@@ -106,6 +107,7 @@ export class AuthController {
   }
 
   @Post('refresh')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiBody({
     description: 'Refresh token payload',
@@ -145,6 +147,7 @@ export class AuthController {
 
   @Post('logout')
   @UseGuards(JwtRefreshGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'User logout' })
   @ApiResponse({ status: 200, description: 'Logout successful.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
@@ -184,6 +187,7 @@ export class AuthController {
 
   @Get('/kakao')
   @UseGuards(KakaoAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Kakao login redirect' })
   @ApiResponse({ status: 301, description: 'Redirect to Kakao login page.' })
   async kakaoLogin1(@Req() req: Request) {
@@ -193,6 +197,7 @@ export class AuthController {
   @Get('callback/kakao')
   @UseGuards(KakaoAuthGuard)
   @HttpCode(301)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Kakao login callback' })
   @ApiResponse({ status: 200, description: 'Kakao login successful.' })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
