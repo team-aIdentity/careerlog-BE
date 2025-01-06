@@ -2,9 +2,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   Post,
+  Put,
   Req,
   Res,
   UnauthorizedException,
@@ -27,6 +29,9 @@ import { RefreshTokenDto } from './dto/refreshToken.dto';
 import { JwtAccessAuthGuard } from './jwt/jwtAccessAuth.guard';
 import { JwtRefreshGuard } from './jwt/jwtRefresh.guard';
 import { KakaoAuthGuard } from './kakao/kakaoAuth.guard';
+import { VerifyCodeRequestDto } from './dto/verifyCodeRequest.dto';
+import { ChangePwdDto } from './dto/changePwd.dto';
+import { DeleteUserDto } from './dto/deleteUser.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -240,5 +245,88 @@ export class AuthController {
       accessToken: accessToken,
       refreshToken: refreshToken,
     });
+  }
+
+  @Post('send-phone-verify-code')
+  @ApiOperation({ summary: 'Send phone verify code' })
+  @ApiResponse({
+    status: 200,
+    description: 'Phone verify code sent successfully.',
+  })
+  @ApiBody({
+    description: 'Phone verify code request payload',
+    type: VerifyCodeRequestDto,
+    examples: {
+      example1: {
+        summary: 'Example payload',
+        value: {
+          phoneNumber: '01012345678',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async sendPhoneVerifyCode(
+    @Body() verifyCodeRequestDto: VerifyCodeRequestDto,
+  ) {
+    return this.authService.sendPhoneVerifyCode(verifyCodeRequestDto);
+  }
+
+  @Post('verify-phone-number')
+  @ApiOperation({ summary: 'Verify phone number' })
+  @ApiBody({
+    description: 'Phone number verify payload',
+    type: VerifyCodeRequestDto,
+    examples: {
+      example1: {
+        summary: 'Example payload',
+        value: {
+          phoneNumber: '01012345678',
+          code: '123456',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Phone number verified successfully.',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async verifyPhoneNumber(@Body() verifyCodeRequestDto: VerifyCodeRequestDto) {
+    return this.authService.verifyPhoneNumber(verifyCodeRequestDto);
+  }
+
+  @Put('change-password')
+  @UseGuards(JwtAccessAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Change password' })
+  @ApiBody({
+    description: 'Change password payload',
+    type: ChangePwdDto,
+    examples: {
+      example1: {
+        summary: 'Example payload',
+        value: {
+          password: 'password123',
+          newPassword: 'password456',
+          verifyNewPassword: 'password456',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Password changed successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async changePassword(@Body() changePwdDto: ChangePwdDto, @Req() req: any) {
+    return this.authService.changePassword(changePwdDto, req.user.id);
+  }
+
+  @Delete('delete')
+  @UseGuards(JwtAccessAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete user' })
+  @ApiResponse({ status: 200, description: 'User deleted successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async deleteUser(@Req() req: any, @Body() deleteUserDto: DeleteUserDto) {
+    return this.authService.deleteUser(deleteUserDto, req.user.id);
   }
 }

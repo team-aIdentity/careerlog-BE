@@ -37,7 +37,7 @@ export class Academic {
   @Column({ nullable: false, default: false })
   isInclude: boolean;
 
-  @ManyToOne(() => User, (user) => user.academics)
+  @ManyToOne(() => User, (user) => user.academics, { onDelete: 'CASCADE' })
   user: User;
 
   @CreateDateColumn()

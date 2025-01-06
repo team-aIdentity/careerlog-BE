@@ -43,7 +43,7 @@ export class Project {
   @Column({ nullable: false, default: false })
   isInclude: boolean;
 
-  @ManyToOne(() => User, (user) => user.projects)
+  @ManyToOne(() => User, (user) => user.projects, { onDelete: 'CASCADE' })
   user: User;
 
   @CreateDateColumn()

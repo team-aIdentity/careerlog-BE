@@ -50,7 +50,7 @@ export class Product {
   @Column({ select: true, nullable: true })
   productGeneralLink: string;
 
-  @ManyToOne(() => User, (user) => user.products)
+  @ManyToOne(() => User, (user) => user.products, { onDelete: 'CASCADE' })
   user: User;
 
   @OneToMany(() => SavedProduct, (savedProduct) => savedProduct.product)

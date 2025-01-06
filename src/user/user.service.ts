@@ -608,4 +608,21 @@ export class UserService {
     await this.cultureRepository.remove(culture);
     return { message: 'Culture deleted successfully', culture };
   }
+
+  async findOneByPhone(phoneNumber: string): Promise<User | null> {
+    return await this.userRepository.findOne({
+      where: { profile: { phone: phoneNumber } },
+    });
+  }
+
+  async updatePassword(userId: number, password: string): Promise<User> {
+    const user = await this.findOne(userId);
+    user.password = password;
+    return await this.userRepository.save(user);
+  }
+
+  async delete(userId: number): Promise<User> {
+    const user = await this.findOne(userId);
+    return await this.userRepository.remove(user);
+  }
 }

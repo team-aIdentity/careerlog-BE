@@ -28,7 +28,7 @@ export class Certification {
   @Column({ nullable: false, default: false })
   isInclude: boolean;
 
-  @ManyToOne(() => User, (user) => user.certifications)
+  @ManyToOne(() => User, (user) => user.certifications, { onDelete: 'CASCADE' })
   user: User;
 
   @CreateDateColumn()

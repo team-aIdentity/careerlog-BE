@@ -25,7 +25,7 @@ export class Language {
   @Column({ nullable: false, default: false })
   isInclude: boolean;
 
-  @ManyToOne(() => User, (user) => user.languages)
+  @ManyToOne(() => User, (user) => user.languages, { onDelete: 'CASCADE' })
   user: User;
 
   @CreateDateColumn()

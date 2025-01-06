@@ -41,7 +41,7 @@ export class Career {
   @ManyToOne(() => JobRank, (jobRank) => jobRank.careers)
   jobRank: JobRank;
 
-  @ManyToOne(() => User, (user) => user.careers)
+  @ManyToOne(() => User, (user) => user.careers, { onDelete: 'CASCADE' })
   user: User;
 
   @CreateDateColumn()

@@ -34,7 +34,7 @@ export class Activity {
   @Column({ nullable: false, default: false })
   isInclude: boolean;
 
-  @ManyToOne(() => User, (user) => user.activities)
+  @ManyToOne(() => User, (user) => user.activities, { onDelete: 'CASCADE' })
   user: User;
 
   @CreateDateColumn()

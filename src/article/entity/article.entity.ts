@@ -29,7 +29,7 @@ export class Article {
   @Column({ default: 0 })
   viewCount: number;
 
-  @ManyToOne(() => User, (user) => user.articles)
+  @ManyToOne(() => User, (user) => user.articles, { onDelete: 'CASCADE' })
   user: User;
 
   @OneToMany(() => SavedArticle, (savedArticle) => savedArticle.article)
