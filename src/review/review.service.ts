@@ -78,4 +78,40 @@ export class ReviewService {
     await this.reviewRepository.remove(review);
     return { message: 'Review deleted successfully', review };
   }
+
+  async findByUserId(
+    userId: number,
+    pageSize: number,
+    page: number,
+  ): Promise<any> {
+    const [reviews, total] = await this.reviewRepository.findAndCount({
+      where: { user: { id: userId } },
+      relations: ['user', 'user.profile'],
+      take: pageSize,
+      skip: (page - 1) * pageSize,
+    });
+
+    return {
+      data: reviews,
+      meta: {
+        total,
+        page,
+        last_page: Math.ceil(total / pageSize),
+      },
+    };
+  }
+
+  async findByUserIdAndProductId(
+    userId: number,
+    productId: number,
+  ): Promise<Review> {
+    const review = await this.reviewRepository.findOne({
+      where: { user: { id: userId }, product: { id: productId } },
+      relations: ['user', 'user.profile', 'product'],
+    });
+    if (!review) {
+      throw new NotFoundException('Review not found');
+    }
+    return review;
+  }
 }

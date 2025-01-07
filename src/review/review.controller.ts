@@ -48,6 +48,36 @@ export class ReviewController {
     return await this.reviewService.findByProductId(productId, pageSize, page);
   }
 
+  @Get('my')
+  @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Get my reviews' })
+  @ApiResponse({ status: 200, description: 'List of my reviews.' })
+  async getMyReviews(
+    @Req() req: any,
+    @Query('pageSize') pageSize: number,
+    @Query('page') page: number,
+  ) {
+    return await this.reviewService.findByUserId(req.user.id, pageSize, page);
+  }
+
+  @Get('product/:productId/my')
+  @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'Get my reviews for a product' })
+  @ApiParam({ name: 'productId', description: 'Product ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Review details.',
+  })
+  async getMyReviewsForProduct(
+    @Req() req: any,
+    @Param('productId') productId: number,
+  ) {
+    return await this.reviewService.findByUserIdAndProductId(
+      req.user.id,
+      productId,
+    );
+  }
+
   @Get(':id')
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({ summary: 'Get a specific review by ID' })
