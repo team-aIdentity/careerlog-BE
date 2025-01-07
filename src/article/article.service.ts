@@ -63,7 +63,7 @@ export class ArticleService {
         break;
       case 'like':
         query
-          .leftJoin('article.userSaved', 'userSaved')
+          .leftJoinAndSelect('article.userSaved', 'userSaved')
           .addSelect('COUNT(userSaved.id)', 'userSavedCount')
           .groupBy('article.id')
           .orderBy('userSavedCount', 'DESC');
