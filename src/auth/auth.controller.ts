@@ -349,6 +349,7 @@ export class AuthController {
           email: 'user@example.com',
           name: 'John Doe',
           birth: '1990-01-01',
+          phoneNumber: '01012345678',
         },
       },
     },

@@ -9,4 +9,7 @@ export class ForgetPasswordDto {
 
   @IsString()
   birth: string;
+
+  @IsString()
+  phoneNumber: string;
 }

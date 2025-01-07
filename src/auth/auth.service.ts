@@ -362,22 +362,79 @@ export class AuthService {
    */
   async forgetPassword(
     forgetPasswordDto: ForgetPasswordDto,
-  ): Promise<{ token: string }> {
-    const { email, name, birth } = forgetPasswordDto;
+  ): Promise<{ code: string; token: string }> {
+    const { email, name, birth, phoneNumber } = forgetPasswordDto;
+    const appKey = this.configService.get<string>('KAKAO_ALIMTALK_APP_KEY');
+    const secretKey = this.configService.get<string>(
+      'KAKAO_ALIMTALK_SECRET_KEY',
+    );
+    const senderKey = this.configService.get<string>(
+      'KAKAO_ALIMTALK_SENDER_KEY',
+    );
     const user = await this.userService.findOneByEmail(email);
     if (!user) {
       throw new BadRequestException('User not found');
     }
 
     const isMatch =
-      user.profile.name === name && user.profile.birthDate === birth;
+      user.profile.name === name &&
+      user.profile.birthDate === birth &&
+      user.profile.phone === phoneNumber;
     if (!isMatch) {
       throw new BadRequestException('Invalid user information');
     }
 
-    const token = await this.generateAccessToken(user);
+    const code = await this.generatePhoneVerifyCode();
 
-    return { token };
+    const phoneVerify = await this.phoneVerifyRepository.create({
+      phoneNumber,
+      verifyCode: code,
+      expiredAt: new Date(Date.now() + 1000 * 60 * 5),
+      isVerified: false,
+    });
+    await this.phoneVerifyRepository.save(phoneVerify);
+
+    // send verify code to phone number
+    try {
+      const response = await fetch(
+        `https://api-alimtalk.cloud.toast.com/alimtalk/v2.3/appkeys/${appKey}/messages`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json;charset=UTF-8',
+            'X-Secret-Key': secretKey,
+          },
+          body: JSON.stringify({
+            senderKey: senderKey,
+            templateCode: 'phone_verify1',
+            recipientList: [
+              {
+                recipientNo: phoneNumber,
+                templateParameter: {
+                  code: code,
+                },
+              },
+            ],
+          }),
+        },
+      );
+      const json = await response.json();
+      if (json.header.isSuccessful === false) {
+        throw new InternalServerErrorException('Failed to send verify code');
+      }
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to send verify code');
+    }
+
+    return { code, token: await this.generateOneTimeToken(user) };
+  }
+
+  async generateOneTimeToken(user: User): Promise<string> {
+    const payload = { id: user.id, email: user.email, name: user.profile.name };
+    return this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+      expiresIn: '10m',
+    });
   }
 
   /**

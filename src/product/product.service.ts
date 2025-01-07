@@ -73,14 +73,14 @@ export class ProductService {
       case 'like':
         query
           .leftJoin('product.userSaved', 'userSaved')
-          .addSelect('COUNT(product.userSaved.id)', 'userSavedCount')
+          .addSelect('COUNT(userSaved.id)', 'userSavedCount')
           .groupBy('product.id')
           .addGroupBy('user.id')
           .addGroupBy('profile.id')
           .addGroupBy('category.id')
           .addGroupBy('jobChangeStage.id')
           .addGroupBy('job.id')
-          .orderBy('COUNT(product.userSaved.id)', 'DESC');
+          .orderBy('COUNT(userSaved.id)', 'DESC');
         break;
       default:
         query.orderBy('product.createdAt', 'DESC');
