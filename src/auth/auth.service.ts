@@ -19,6 +19,8 @@ import { PhoneVerify } from './entity/phoneVerify.entity';
 import { MoreThanOrEqual, Repository } from 'typeorm';
 import { DeleteUserDto } from './dto/deleteUser.dto';
 import { ChangePwdDto } from './dto/changePwd.dto';
+import { ForgetPasswordDto } from './dto/forgetPwd.dto';
+import { ResetPasswordDto } from './dto/resetPwd.dto';
 
 @Injectable()
 export class AuthService {
@@ -351,5 +353,58 @@ export class AuthService {
     }
 
     return await this.userService.delete(userId);
+  }
+
+  /**
+   * forget password
+   * @param forgetPasswordDto
+   * @returns
+   */
+  async forgetPassword(
+    forgetPasswordDto: ForgetPasswordDto,
+  ): Promise<{ token: string }> {
+    const { email, name, birth } = forgetPasswordDto;
+    const user = await this.userService.findOneByEmail(email);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const isMatch =
+      user.profile.name === name && user.profile.birthDate === birth;
+    if (!isMatch) {
+      throw new BadRequestException('Invalid user information');
+    }
+
+    const token = await this.generateAccessToken(user);
+
+    return { token };
+  }
+
+  /**
+   * reset password
+   * @param resetPasswordDto
+   * @returns
+   */
+  async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<boolean> {
+    const { token, password, confirmPassword } = resetPasswordDto;
+
+    const decodedToken = this.jwtService.verify(token, {
+      secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+    });
+
+    const user = await this.userService.findOne(decodedToken.id);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const isMatch = password === confirmPassword;
+    if (!isMatch) {
+      throw new BadRequestException('Password does not match');
+    }
+
+    const hashedPassword = await this.generateHasedPwd(password);
+    await this.userService.updatePassword(user.id, hashedPassword);
+
+    return true;
   }
 }

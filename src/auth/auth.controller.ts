@@ -32,6 +32,8 @@ import { KakaoAuthGuard } from './kakao/kakaoAuth.guard';
 import { VerifyCodeRequestDto } from './dto/verifyCodeRequest.dto';
 import { ChangePwdDto } from './dto/changePwd.dto';
 import { DeleteUserDto } from './dto/deleteUser.dto';
+import { ForgetPasswordDto } from './dto/forgetPwd.dto';
+import { ResetPasswordDto } from './dto/resetPwd.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -333,5 +335,50 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
   async deleteUser(@Req() req: any, @Body() deleteUserDto: DeleteUserDto) {
     return this.authService.deleteUser(deleteUserDto, req.user.id);
+  }
+
+  @Post('forget-password')
+  @ApiOperation({ summary: 'Forget password' })
+  @ApiBody({
+    description: 'Forget password payload',
+    type: ForgetPasswordDto,
+    examples: {
+      example1: {
+        summary: 'Example payload',
+        value: {
+          email: 'user@example.com',
+          name: 'John Doe',
+          birth: '1990-01-01',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Password forget successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  async forgetPassword(@Body() forgetPasswordDto: ForgetPasswordDto) {
+    return this.authService.forgetPassword(forgetPasswordDto);
+  }
+
+  @Post('reset-password')
+  @ApiOperation({ summary: 'Reset password' })
+  @ApiBody({
+    description: 'Reset password payload',
+    type: ResetPasswordDto,
+    examples: {
+      example1: {
+        summary: 'Example payload',
+        value: {
+          token: 'token',
+          password: 'password123',
+          confirmPassword: 'password123',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Password reset successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  @ApiResponse({ status: 400, description: 'Invalid password.' })
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetPasswordDto);
   }
 }
