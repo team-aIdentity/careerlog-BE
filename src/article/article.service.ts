@@ -65,7 +65,12 @@ export class ArticleService {
         query
           .leftJoin('article.userSaved', 'userSaved')
           .addSelect('COUNT(userSaved.id)', 'userSavedCount')
-          .orderBy('COUNT(userSaved.id)', 'DESC');
+          .groupBy('article.id')
+          .addGroupBy('user.id')
+          .addGroupBy('profile.id')
+          .addGroupBy('category.id')
+          .addGroupBy('job.id')
+          .orderBy('userSavedCount', 'DESC');
         break;
       default:
         query.orderBy('article.createdAt', 'DESC');
