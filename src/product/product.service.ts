@@ -74,12 +74,6 @@ export class ProductService {
         query
           .leftJoin('product.userSaved', 'userSaved')
           .addSelect('COUNT(userSaved.id)', 'userSavedCount')
-          .groupBy('product.id')
-          .addGroupBy('user.id')
-          .addGroupBy('profile.id')
-          .addGroupBy('category.id')
-          .addGroupBy('jobChangeStage.id')
-          .addGroupBy('job.id')
           .orderBy('COUNT(userSaved.id)', 'DESC');
         break;
       default:
