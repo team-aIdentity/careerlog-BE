@@ -23,11 +23,11 @@ export class Career {
   @Column({ nullable: false })
   team: string;
 
-  @Column({ nullable: false })
-  startAt: Date;
+  @Column({ nullable: true })
+  startAt: string;
 
   @Column({ nullable: true })
-  endAt: Date;
+  endAt: string;
 
   @Column({ nullable: false, default: false })
   isCurrent: boolean;
