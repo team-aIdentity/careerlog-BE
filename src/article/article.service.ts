@@ -42,8 +42,7 @@ export class ArticleService {
       .leftJoinAndSelect('article.user', 'user')
       .leftJoinAndSelect('user.profile', 'profile')
       .leftJoinAndSelect('article.category', 'category')
-      .leftJoinAndSelect('article.job', 'job')
-      .leftJoinAndSelect('article.userSaved', 'userSaved');
+      .leftJoinAndSelect('article.job', 'job');
 
     if (jobId) {
       query.andWhere('article.jobId = :jobId', { jobId });
@@ -63,14 +62,7 @@ export class ArticleService {
         query.orderBy('article.viewCount', 'DESC');
         break;
       case 'like':
-        query
-          .addSelect('COUNT(userSaved)', 'userSavedCount')
-          .groupBy('article.id')
-          .addGroupBy('user.id')
-          .addGroupBy('profile.id')
-          .addGroupBy('category.id')
-          .addGroupBy('job.id')
-          .orderBy('COUNT(userSaved.id)', 'DESC');
+        query.orderBy('article.userSavedCount', 'DESC');
         break;
       default:
         query.orderBy('article.createdAt', 'DESC');
@@ -343,6 +335,11 @@ export class ArticleService {
       article: article,
     });
 
+    const savedArticleCount = await this.getSavedUserCount(articleId);
+    await this.articleRepository.update(articleId, {
+      userSavedCount: savedArticleCount,
+    });
+
     this.logger.log(`Article ID: ${articleId} saved for user ID: ${userId}`);
   }
 
@@ -351,6 +348,10 @@ export class ArticleService {
     const result = await this.savedArticleRepository.delete({
       user: { id: userId },
       article: { id: articleId },
+    });
+    const savedArticleCount = await this.getSavedUserCount(articleId);
+    await this.articleRepository.update(articleId, {
+      userSavedCount: savedArticleCount,
     });
     this.logger.log(`Article ID: ${articleId} unsaved for user ID: ${userId}`);
     return result;

@@ -56,6 +56,9 @@ export class Product {
   @OneToMany(() => SavedProduct, (savedProduct) => savedProduct.product)
   userSaved: SavedProduct[];
 
+  @Column({ default: 0 })
+  userSavedCount: number;
+
   @OneToMany(() => Cart, (cart) => cart.product)
   cart: Cart[];
 

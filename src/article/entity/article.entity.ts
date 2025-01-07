@@ -35,6 +35,9 @@ export class Article {
   @OneToMany(() => SavedArticle, (savedArticle) => savedArticle.article)
   userSaved: SavedArticle[];
 
+  @Column({ default: 0 })
+  userSavedCount: number;
+
   @ManyToOne(
     () => AritcleCategory,
     (articleCategory) => articleCategory.articles,

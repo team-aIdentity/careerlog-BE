@@ -71,16 +71,7 @@ export class ProductService {
         query.orderBy('product.viewCount', 'DESC');
         break;
       case 'like':
-        query
-          .leftJoin('product.userSaved', 'userSaved')
-          .addSelect('COUNT(userSaved.id)', 'userSavedCount')
-          .groupBy('product.id')
-          .addGroupBy('user.id')
-          .addGroupBy('profile.id')
-          .addGroupBy('category.id')
-          .addGroupBy('jobChangeStage.id')
-          .addGroupBy('job.id')
-          .orderBy('COUNT(userSaved.id)', 'DESC');
+        query.orderBy('product.userSavedCount', 'DESC');
         break;
       default:
         query.orderBy('product.createdAt', 'DESC');
@@ -381,6 +372,11 @@ export class ProductService {
       product,
     });
 
+    const savedProductCount = await this.getSavedUserCount(productId);
+    await this.productRepository.update(productId, {
+      userSavedCount: savedProductCount,
+    });
+
     this.logger.log(
       `Product with ID: ${productId} saved for userId: ${userId}`,
     );
@@ -393,6 +389,10 @@ export class ProductService {
     const result = await this.savedProductRepository.delete({
       user: { id: userId },
       product: { id: productId },
+    });
+    const savedProductCount = await this.getSavedUserCount(productId);
+    await this.productRepository.update(productId, {
+      userSavedCount: savedProductCount,
     });
     this.logger.log(
       `Product with ID: ${productId} unsaved for userId: ${userId}`,
