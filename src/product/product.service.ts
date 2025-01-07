@@ -73,7 +73,7 @@ export class ProductService {
       case 'like':
         query
           .leftJoin('product.userSaved', 'userSaved')
-          .addSelect('COUNT(userSaved.id) AS userSavedCount')
+          .addSelect('COUNT(userSaved.id)', 'userSavedCount')
           .groupBy('product.id')
           .addGroupBy('user.id')
           .addGroupBy('profile.id')

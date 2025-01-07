@@ -64,7 +64,7 @@ export class ArticleService {
       case 'like':
         query
           .leftJoin('article.userSaved', 'userSaved')
-          .addSelect('COUNT(userSaved.id) AS userSavedCount')
+          .addSelect('COUNT(userSaved.id)', 'userSavedCount')
           .groupBy('article.id')
           .addGroupBy('user.id')
           .addGroupBy('profile.id')
