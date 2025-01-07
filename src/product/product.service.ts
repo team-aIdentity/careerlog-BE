@@ -172,26 +172,72 @@ export class ProductService {
     return product;
   }
 
-  async findWithKeyword(keyword: string) {
+  async findWithKeyword(
+    keyword: string,
+    pageSize: number,
+    page: number,
+    categoryId: number,
+    jobId: number,
+    jobChangeStageId: number,
+    orderBy: string,
+  ) {
     this.logger.log(`Finding products with keyword: ${keyword}`);
     if (!keyword || keyword.trim() === '') {
       this.logger.error('Keyword must be provided');
       throw new BadRequestException('Keyword must be provided');
     }
 
-    const products = await this.productRepository
-      .createQueryBuilder('product')
+    const query = this.productRepository.createQueryBuilder('product');
+
+    query
       .where('product.content LIKE :keyword', { keyword: `%${keyword}%` })
       .orWhere('product.title LIKE :keyword', { keyword: `%${keyword}%` })
-      .leftJoinAndSelect('product.user', 'user')
-      .getMany();
+      .leftJoinAndSelect('product.user', 'user');
 
-    if (products.length === 0) {
-      this.logger.error('No products found matching the keyword');
-      throw new BadRequestException('No products found matching the keyword');
+    if (categoryId) {
+      query.andWhere('product.categoryId = :categoryId', { categoryId });
     }
 
-    return products;
+    if (jobId) {
+      query.andWhere('product.jobId = :jobId', { jobId });
+    }
+
+    if (jobChangeStageId) {
+      query.andWhere('product.jobChangeStageId = :jobChangeStageId', {
+        jobChangeStageId,
+      });
+    }
+
+    switch (orderBy) {
+      case 'latest':
+        query.orderBy('product.createdAt', 'DESC');
+        break;
+      case 'oldest':
+        query.orderBy('product.createdAt', 'ASC');
+        break;
+      case 'viewCount':
+        query.orderBy('product.viewCount', 'DESC');
+        break;
+      case 'like':
+        query.orderBy('product.userSavedCount', 'DESC');
+        break;
+      default:
+        query.orderBy('product.createdAt', 'DESC');
+    }
+
+    const [products, total] = await query
+      .take(pageSize)
+      .skip((page - 1) * pageSize)
+      .getManyAndCount();
+
+    return {
+      data: products,
+      meta: {
+        total,
+        page,
+        last_page: Math.ceil(total / pageSize),
+      },
+    };
   }
 
   async deleteOne(productId: number, userId: number) {

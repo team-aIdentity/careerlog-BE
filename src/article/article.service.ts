@@ -210,29 +210,67 @@ export class ArticleService {
     return article;
   }
 
-  async findWithKeyword(keyword: string) {
+  async findWithKeyword(
+    keyword: string,
+    pageSize: number,
+    page: number,
+    categoryId: number,
+    jobId: number,
+    orderBy: string,
+  ) {
     this.logger.log(`Searching articles with keyword: ${keyword}`);
     if (!keyword || keyword.trim() === '') {
       this.logger.warn('Keyword must be provided');
       throw new BadRequestException('Keyword must be provided');
     }
 
-    const articles = await this.articleRepository
+    const query = this.articleRepository
       .createQueryBuilder('article')
       .where('article.content LIKE :keyword', { keyword: `%${keyword}%` })
       .orWhere('article.title LIKE :keyword', { keyword: `%${keyword}%` })
-      .leftJoinAndSelect('article.user', 'user')
-      .getMany();
+      .leftJoinAndSelect('article.user', 'user');
 
-    if (articles.length === 0) {
-      this.logger.warn(`No articles found matching the keyword: ${keyword}`);
-      throw new BadRequestException('No articles found matching the keyword');
+    if (categoryId) {
+      query.andWhere('article.categoryId = :categoryId', { categoryId });
     }
+
+    if (jobId) {
+      query.andWhere('article.jobId = :jobId', { jobId });
+    }
+
+    switch (orderBy) {
+      case 'latest':
+        query.orderBy('article.createdAt', 'DESC');
+        break;
+      case 'oldest':
+        query.orderBy('article.createdAt', 'ASC');
+        break;
+      case 'viewCount':
+        query.orderBy('article.viewCount', 'DESC');
+        break;
+      case 'like':
+        query.orderBy('article.userSavedCount', 'DESC');
+        break;
+      default:
+        query.orderBy('article.createdAt', 'DESC');
+    }
+
+    const [articles, total] = await query
+      .take(pageSize)
+      .skip((page - 1) * pageSize)
+      .getManyAndCount();
 
     this.logger.log(
       `Found ${articles.length} articles matching the keyword: ${keyword}`,
     );
-    return articles;
+    return {
+      data: articles,
+      meta: {
+        total,
+        page,
+        last_page: Math.ceil(total / pageSize),
+      },
+    };
   }
 
   async deleteOne(articleId: number, userId: number) {

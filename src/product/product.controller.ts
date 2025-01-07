@@ -335,12 +335,46 @@ export class ProductController {
   @Get('search/:keyword')
   @ApiOperation({ summary: 'Search products by keyword' })
   @ApiParam({ name: 'keyword', description: 'Search keyword' })
+  @ApiQuery({
+    name: 'pageSize',
+    description: 'Number of records per page',
+    required: false,
+  })
+  @ApiQuery({ name: 'page', description: 'Page number', required: false })
+  @ApiQuery({
+    name: 'categoryId',
+    description: 'Category ID',
+    required: false,
+  })
+  @ApiQuery({ name: 'jobId', description: 'Job ID', required: false })
+  @ApiQuery({
+    name: 'jobChangeStageId',
+    description: 'Job Change Stage ID',
+    required: false,
+  })
+  @ApiQuery({ name: 'orderBy', description: 'Order by', required: false })
   @ApiResponse({
     status: 200,
     description: 'List of products matching the keyword.',
   })
-  async searchProduct(@Param('keyword') keyword: string) {
-    return await this.productService.findWithKeyword(keyword);
+  async searchProduct(
+    @Param('keyword') keyword: string,
+    @Query('pageSize') pageSize: number,
+    @Query('page') page: number,
+    @Query('categoryId') categoryId: number,
+    @Query('jobId') jobId: number,
+    @Query('jobChangeStageId') jobChangeStageId: number,
+    @Query('orderBy') orderBy: string,
+  ) {
+    return await this.productService.findWithKeyword(
+      keyword,
+      pageSize,
+      page,
+      categoryId,
+      jobId,
+      jobChangeStageId,
+      orderBy,
+    );
   }
 
   @Post('my')
