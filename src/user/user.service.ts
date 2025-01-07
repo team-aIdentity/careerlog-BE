@@ -552,7 +552,7 @@ export class UserService {
       secondaryOccupation: secondaryOccupation?.name,
       expectedSalary: profile.expectSalary,
       expectedOrganizationCultureId: profile.expectCulture?.id,
-      expectedOrganizationCultureImage: '',
+      expectedOrganizationCultureImage: profile.expectCulture?.image,
       expectedOrganizationCultureTitle: profile.expectCulture?.name,
       expectedOrganizationCultureDescription:
         profile.expectCulture?.description,
