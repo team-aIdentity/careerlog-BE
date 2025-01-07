@@ -70,7 +70,7 @@ export class ArticleService {
           .addGroupBy('profile.id')
           .addGroupBy('category.id')
           .addGroupBy('job.id')
-          .orderBy('userSavedCount', 'DESC');
+          .orderBy('COUNT(userSaved.id)', 'DESC');
         break;
       default:
         query.orderBy('article.createdAt', 'DESC');
