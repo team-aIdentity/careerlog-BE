@@ -65,6 +65,7 @@ export class ArticleService {
         query
           .leftJoin('article.userSaved', 'userSaved')
           .addSelect('COUNT(userSaved.id)', 'userSavedCount')
+          .groupBy('article.id')
           .orderBy('userSavedCount', 'DESC');
         break;
       default:

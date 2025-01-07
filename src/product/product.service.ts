@@ -72,8 +72,9 @@ export class ProductService {
         break;
       case 'like':
         query
-          .leftJoinAndSelect('product.userSaved', 'userSaved')
+          .leftJoin('product.userSaved', 'userSaved')
           .addSelect('COUNT(userSaved.id)', 'userSavedCount')
+          .groupBy('product.id')
           .orderBy('userSavedCount', 'DESC');
         break;
       default:
