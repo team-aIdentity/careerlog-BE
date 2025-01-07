@@ -80,7 +80,12 @@ export class AuthController {
       'credential',
     );
 
-    const cookieOptions = { httpOnly: true, path: '/' };
+    const cookieOptions = {
+      httpOnly: true,
+      path: '/',
+      secure: true,
+      sameSite: 'none' as 'none' | 'lax' | 'strict' | boolean,
+    };
 
     if (loginDto.isPermanant) {
       if (loginDto.isMobile)
@@ -142,7 +147,7 @@ export class AuthController {
       res.cookie('accessToken', newAccessToken, {
         httpOnly: true,
         sameSite: 'none',
-        secure: false,
+        secure: true,
       });
       res.send({ newAccessToken });
     } catch (err) {
@@ -227,17 +232,17 @@ export class AuthController {
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       sameSite: 'none',
-      secure: false,
+      secure: true,
     });
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       sameSite: 'none',
-      secure: false,
+      secure: true,
     });
     res.cookie('deviceId', 'kakao', {
       httpOnly: true,
       sameSite: 'none',
-      secure: false,
+      secure: true,
     });
 
     return res.send({

@@ -22,7 +22,9 @@ export class JwtAccessAuthGuard2 implements CanActivate {
       return true;
     }
 
-    const accessToken = authorizationHeader.split(' ')[1];
+    // const accessToken = authorizationHeader.split(' ')[1];
+    const accessToken = request.cookies['accessToken'];
+
     try {
       const user = await this.jwtService.verifyAsync(accessToken, {
         secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
