@@ -13,6 +13,9 @@ export class Culture {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ nullable: true })
+  image: string;
+
   @Column({ nullable: false })
   name: string;
 

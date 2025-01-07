@@ -8,4 +8,8 @@ export class CreateCultureDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsString()
+  @IsOptional()
+  image?: string;
 }

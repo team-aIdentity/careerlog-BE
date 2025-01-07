@@ -8,4 +8,8 @@ export class UpdateCultureDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @IsString()
+  @IsOptional()
+  image?: string;
 }
