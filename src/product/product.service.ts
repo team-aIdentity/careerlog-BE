@@ -74,7 +74,8 @@ export class ProductService {
         query
           .leftJoinAndSelect('product.userSaved', 'userSaved')
           .addSelect('COUNT(userSaved.id)', 'userSavedCount')
-          .groupBy('product.id')
+          .groupBy('userSaved.id')
+          .addGroupBy('product.id')
           .addGroupBy('user.id')
           .addGroupBy('profile.id')
           .addGroupBy('category.id')

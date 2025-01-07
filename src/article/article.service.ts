@@ -65,7 +65,8 @@ export class ArticleService {
         query
           .leftJoinAndSelect('article.userSaved', 'userSaved')
           .addSelect('COUNT(userSaved.id)', 'userSavedCount')
-          .groupBy('article.id')
+          .groupBy('userSaved.id')
+          .addGroupBy('article.id')
           .addGroupBy('user.id')
           .addGroupBy('profile.id')
           .addGroupBy('category.id')
