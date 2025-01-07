@@ -42,7 +42,8 @@ export class ArticleService {
       .leftJoinAndSelect('article.user', 'user')
       .leftJoinAndSelect('user.profile', 'profile')
       .leftJoinAndSelect('article.category', 'category')
-      .leftJoinAndSelect('article.job', 'job');
+      .leftJoinAndSelect('article.job', 'job')
+      .leftJoinAndSelect('article.userSaved', 'userSaved');
 
     if (jobId) {
       query.andWhere('article.jobId = :jobId', { jobId });
