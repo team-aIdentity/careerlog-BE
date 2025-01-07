@@ -44,13 +44,25 @@ export class ArticleController {
     required: false,
   })
   @ApiQuery({ name: 'page', description: 'Page number', required: false })
+  @ApiQuery({ name: 'jobId', description: 'Job ID', required: false })
+  @ApiQuery({ name: 'categoryId', description: 'Category ID', required: false })
+  @ApiQuery({ name: 'orderBy', description: 'Order by', required: false })
   @ApiResponse({ status: 200, description: 'List of all articles.' })
   async getAllArticles(
     @Req() req: any,
     @Query('pageSize') pageSize: number,
     @Query('page') page: number,
+    @Query('jobId') jobId: number,
+    @Query('categoryId') categoryId: number,
+    @Query('orderBy') orderBy: string,
   ) {
-    const articles = await this.articleService.findAll(pageSize, page);
+    const articles = await this.articleService.findAll(
+      pageSize,
+      page,
+      jobId,
+      categoryId,
+      orderBy,
+    );
     if (req.user) {
       for (const article of articles.data) {
         article.isSaved = await this.articleService.isArticleSavedByUser(

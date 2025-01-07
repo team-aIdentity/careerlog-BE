@@ -27,17 +27,55 @@ export class ArticleService {
     private articleCategoryRepository: Repository<AritcleCategory>,
   ) {}
 
-  async findAll(take: number, page: number): Promise<any> {
+  async findAll(
+    take: number,
+    page: number,
+    jobId: number,
+    categoryId: number,
+    orderBy: string,
+  ): Promise<any> {
     this.logger.log(
       `Fetching all articles with pagination: take=${take}, page=${page}`,
     );
-    const [articles, total] = await this.articleRepository.findAndCount({
-      take,
-      skip: (page - 1) * take,
-      relations: ['user', 'user.profile'],
-    });
+    const query = this.articleRepository
+      .createQueryBuilder('article')
+      .leftJoinAndSelect('article.user', 'user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .leftJoinAndSelect('article.category', 'category')
+      .leftJoinAndSelect('article.job', 'job');
 
-    this.logger.log(`Fetched ${articles.length} articles`);
+    if (jobId) {
+      query.andWhere('article.jobId = :jobId', { jobId });
+    }
+    if (categoryId) {
+      query.andWhere('article.categoryId = :categoryId', { categoryId });
+    }
+
+    switch (orderBy) {
+      case 'latest':
+        query.orderBy('article.createdAt', 'DESC');
+        break;
+      case 'oldest':
+        query.orderBy('article.createdAt', 'ASC');
+        break;
+      case 'viewCount':
+        query.orderBy('article.viewCount', 'DESC');
+        break;
+      case 'like':
+        query
+          .leftJoinAndSelect('article.userSaved', 'userSaved')
+          .orderBy('COUNT(userSaved.id)', 'DESC');
+        break;
+      default:
+        query.orderBy('article.createdAt', 'DESC');
+    }
+
+    const [articles, total] = await query
+      .take(take)
+      .skip((page - 1) * take)
+      .getManyAndCount();
+
+    this.logger.log(`Found ${total} articles`);
     return {
       data: articles,
       meta: {

@@ -44,13 +44,32 @@ export class ProductController {
     description: 'Number of products per page',
   })
   @ApiQuery({ name: 'page', required: false, description: 'Page number' })
+  @ApiQuery({ name: 'jobId', description: 'Job ID', required: false })
+  @ApiQuery({ name: 'categoryId', description: 'Category ID', required: false })
+  @ApiQuery({ name: 'orderBy', description: 'Order by', required: false })
+  @ApiQuery({
+    name: 'jobChangeStageId',
+    description: 'Job Change Stage ID',
+    required: false,
+  })
   @ApiResponse({ status: 200, description: 'List of all products.' })
   async getAllProducts(
     @Req() req: any,
     @Query('pageSize') pageSize: number,
     @Query('page') page: number,
+    @Query('jobId') jobId: number,
+    @Query('categoryId') categoryId: number,
+    @Query('orderBy') orderBy: string,
+    @Query('jobChangeStageId') jobChangeStageId: number,
   ) {
-    const products = await this.productService.findAll(pageSize, page);
+    const products = await this.productService.findAll(
+      pageSize,
+      page,
+      jobId,
+      categoryId,
+      orderBy,
+      jobChangeStageId,
+    );
     if (req.user) {
       for (const product of products.data) {
         product.savedUserCount = await this.productService.getSavedUserCount(

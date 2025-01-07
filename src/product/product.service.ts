@@ -32,13 +32,56 @@ export class ProductService {
     private productCategoryRepository: Repository<ProductCategory>,
   ) {}
 
-  async findAll(take: number, page: number): Promise<any> {
+  async findAll(
+    take: number,
+    page: number,
+    jobId: number,
+    categoryId: number,
+    orderBy: string,
+    jobChangeStageId: number,
+  ): Promise<any> {
     this.logger.log(`Finding all products with take: ${take}, page: ${page}`);
-    const [products, total] = await this.productRepository.findAndCount({
-      take,
-      skip: (page - 1) * take,
-      relations: ['user', 'user.profile', 'category', 'jobChangeStage', 'job'],
-    });
+    const query = this.productRepository
+      .createQueryBuilder('product')
+      .leftJoinAndSelect('product.user', 'user')
+      .leftJoinAndSelect('user.profile', 'profile')
+      .leftJoinAndSelect('product.category', 'category')
+      .leftJoinAndSelect('product.jobChangeStage', 'jobChangeStage')
+      .leftJoinAndSelect('product.job', 'job');
+
+    if (jobId) {
+      query.andWhere('product.jobId = :jobId', { jobId });
+    }
+    if (categoryId) {
+      query.andWhere('product.categoryId = :categoryId', { categoryId });
+    }
+    if (jobChangeStageId) {
+      query.andWhere('product.jobChangeStageId = :jobChangeStageId', {
+        jobChangeStageId,
+      });
+    }
+    switch (orderBy) {
+      case 'latest':
+        query.orderBy('product.createdAt', 'DESC');
+        break;
+      case 'oldest':
+        query.orderBy('product.createdAt', 'ASC');
+        break;
+      case 'viewCount':
+        query.orderBy('product.viewCount', 'DESC');
+        break;
+      case 'like':
+        query
+          .leftJoinAndSelect('product.userSaved', 'userSaved')
+          .orderBy('COUNT(userSaved.id)', 'DESC');
+        break;
+      default:
+        query.orderBy('product.createdAt', 'DESC');
+    }
+    const [products, total] = await query
+      .take(take)
+      .skip((page - 1) * take)
+      .getManyAndCount();
     this.logger.log(`Found ${total} products`);
 
     return {
