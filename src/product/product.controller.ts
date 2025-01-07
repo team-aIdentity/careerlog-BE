@@ -72,14 +72,17 @@ export class ProductController {
     );
     if (req.user) {
       for (const product of products.data) {
-        product.savedUserCount = await this.productService.getSavedUserCount(
-          product.id,
-        );
         product.isSaved = await this.productService.isProductSavedByUser(
           req.user.id,
           product.id,
         );
       }
+    }
+
+    for (const product of products.data) {
+      product.savedUserCount = await this.productService.getSavedUserCount(
+        product.id,
+      );
     }
     return products;
   }

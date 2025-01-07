@@ -69,10 +69,12 @@ export class ArticleController {
           req.user.id,
           article.id,
         );
-        article.savedUserCount = await this.articleService.getSavedUserCount(
-          article.id,
-        );
       }
+    }
+    for (const article of articles.data) {
+      article.savedUserCount = await this.articleService.getSavedUserCount(
+        article.id,
+      );
     }
     return articles;
   }
