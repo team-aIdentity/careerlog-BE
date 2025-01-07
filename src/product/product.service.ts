@@ -80,7 +80,7 @@ export class ProductService {
           .addGroupBy('category.id')
           .addGroupBy('jobChangeStage.id')
           .addGroupBy('job.id')
-          .orderBy('userSavedCount', 'DESC');
+          .orderBy('COUNT(userSaved.id)', 'DESC');
         break;
       default:
         query.orderBy('product.createdAt', 'DESC');
