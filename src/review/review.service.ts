@@ -37,6 +37,9 @@ export class ReviewService {
       case 'rate':
         query.orderBy('review.rate', 'DESC');
         break;
+      case 'rate_asc':
+        query.orderBy('review.rate', 'ASC');
+        break;
       default:
         query.orderBy('review.createdAt', 'DESC');
     }
@@ -119,6 +122,9 @@ export class ReviewService {
         break;
       case 'rate':
         query.orderBy('review.rate', 'DESC');
+        break;
+      case 'rate_asc':
+        query.orderBy('review.rate', 'ASC');
         break;
       default:
         query.orderBy('review.createdAt', 'DESC');
