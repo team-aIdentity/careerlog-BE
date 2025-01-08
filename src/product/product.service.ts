@@ -452,6 +452,14 @@ export class ProductService {
     );
     const [carts, total] = await this.cartRepository.findAndCount({
       where: { user: { id: userId } },
+      relations: [
+        'product',
+        'product.user',
+        'product.user.profile',
+        'product.category',
+        'product.jobChangeStage',
+        'product.job',
+      ],
       take,
       skip: (page - 1) * take,
     });
@@ -475,6 +483,14 @@ export class ProductService {
       where: { user: { id: userId }, isBought: false },
       take,
       skip: (page - 1) * take,
+      relations: [
+        'product',
+        'product.user',
+        'product.user.profile',
+        'product.category',
+        'product.jobChangeStage',
+        'product.job',
+      ],
     });
     this.logger.log(`Found ${total} before cart items for userId: ${userId}`);
 
@@ -496,6 +512,14 @@ export class ProductService {
       where: { user: { id: userId }, isBought: true },
       take,
       skip: (page - 1) * take,
+      relations: [
+        'product',
+        'product.user',
+        'product.user.profile',
+        'product.category',
+        'product.jobChangeStage',
+        'product.job',
+      ],
     });
     this.logger.log(`Found ${total} after cart items for userId: ${userId}`);
 
