@@ -19,13 +19,32 @@ export class ReviewService {
     productId: number,
     pageSize: number,
     page: number,
+    orderBy: string,
   ): Promise<any> {
-    const [reviews, total] = await this.reviewRepository.findAndCount({
-      where: { product: { id: productId } },
-      relations: ['user', 'user.profile'],
-      take: pageSize,
-      skip: (page - 1) * pageSize,
-    });
+    const query = this.reviewRepository
+      .createQueryBuilder('review')
+      .where('review.productId = :productId', { productId })
+      .leftJoinAndSelect('review.user', 'user')
+      .leftJoinAndSelect('user.profile', 'profile');
+
+    switch (orderBy) {
+      case 'latest':
+        query.orderBy('review.createdAt', 'DESC');
+        break;
+      case 'oldest':
+        query.orderBy('review.createdAt', 'ASC');
+        break;
+      case 'rate':
+        query.orderBy('review.rate', 'DESC');
+        break;
+      default:
+        query.orderBy('review.createdAt', 'DESC');
+    }
+
+    const [reviews, total] = await query
+      .take(pageSize)
+      .skip((page - 1) * pageSize)
+      .getManyAndCount();
 
     return {
       data: reviews,
@@ -83,13 +102,32 @@ export class ReviewService {
     userId: number,
     pageSize: number,
     page: number,
+    orderBy: string,
   ): Promise<any> {
-    const [reviews, total] = await this.reviewRepository.findAndCount({
-      where: { user: { id: userId } },
-      relations: ['user', 'user.profile'],
-      take: pageSize,
-      skip: (page - 1) * pageSize,
-    });
+    const query = this.reviewRepository
+      .createQueryBuilder('review')
+      .where('review.userId = :userId', { userId })
+      .leftJoinAndSelect('review.user', 'user')
+      .leftJoinAndSelect('user.profile', 'profile');
+
+    switch (orderBy) {
+      case 'latest':
+        query.orderBy('review.createdAt', 'DESC');
+        break;
+      case 'oldest':
+        query.orderBy('review.createdAt', 'ASC');
+        break;
+      case 'rate':
+        query.orderBy('review.rate', 'DESC');
+        break;
+      default:
+        query.orderBy('review.createdAt', 'DESC');
+    }
+
+    const [reviews, total] = await query
+      .take(pageSize)
+      .skip((page - 1) * pageSize)
+      .getManyAndCount();
 
     return {
       data: reviews,

@@ -1,10 +1,4 @@
-import {
-  IsDateString,
-  IsInt,
-  IsOptional,
-  IsString,
-  IsBoolean,
-} from 'class-validator';
+import { IsInt, IsOptional, IsString, IsBoolean } from 'class-validator';
 
 export class UpdateCareerDto {
   @IsString()
@@ -23,11 +17,11 @@ export class UpdateCareerDto {
   @IsOptional()
   isCurrent: boolean;
 
-  @IsDateString()
+  @IsString()
   @IsOptional()
   startAt: string;
 
-  @IsDateString()
+  @IsString()
   @IsOptional()
   endAt: string;
 

@@ -39,25 +39,45 @@ export class ReviewController {
     description: 'Number of reviews per page',
   })
   @ApiQuery({ name: 'page', required: false, description: 'Page number' })
+  @ApiQuery({ name: 'orderBy', required: false, description: 'Order by' })
   @ApiResponse({ status: 200, description: 'List of reviews for the product.' })
   async findByProductId(
     @Param('productId') productId: number,
     @Query('pageSize') pageSize: number,
     @Query('page') page: number,
+    @Query('orderBy') orderBy: string,
   ) {
-    return await this.reviewService.findByProductId(productId, pageSize, page);
+    return await this.reviewService.findByProductId(
+      productId,
+      pageSize,
+      page,
+      orderBy,
+    );
   }
 
   @Get('my')
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({ summary: 'Get my reviews' })
+  @ApiQuery({
+    name: 'pageSize',
+    description: 'Number of records per page',
+    required: false,
+  })
+  @ApiQuery({ name: 'page', description: 'Page number', required: false })
+  @ApiQuery({ name: 'orderBy', description: 'Order by', required: false })
   @ApiResponse({ status: 200, description: 'List of my reviews.' })
   async getMyReviews(
     @Req() req: any,
     @Query('pageSize') pageSize: number,
     @Query('page') page: number,
+    @Query('orderBy') orderBy: string,
   ) {
-    return await this.reviewService.findByUserId(req.user.id, pageSize, page);
+    return await this.reviewService.findByUserId(
+      req.user.id,
+      pageSize,
+      page,
+      orderBy,
+    );
   }
 
   @Get('product/:productId/my')

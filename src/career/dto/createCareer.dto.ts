@@ -1,10 +1,4 @@
-import {
-  IsDateString,
-  IsInt,
-  IsOptional,
-  IsString,
-  IsBoolean,
-} from 'class-validator';
+import { IsInt, IsOptional, IsString, IsBoolean } from 'class-validator';
 
 export class CreateCareerDto {
   @IsString()
@@ -19,10 +13,10 @@ export class CreateCareerDto {
   @IsBoolean()
   isCurrent: boolean;
 
-  @IsDateString()
+  @IsString()
   startAt: string;
 
-  @IsDateString()
+  @IsString()
   @IsOptional()
   endAt: string;
 
