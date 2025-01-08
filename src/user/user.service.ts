@@ -252,12 +252,6 @@ export class UserService {
         'userRoles.role',
         'providers',
         'providers.provider',
-        'products',
-        'articles',
-        'savedArticles',
-        'savedProducts',
-        'careers',
-        'academics',
       ],
     });
   }
