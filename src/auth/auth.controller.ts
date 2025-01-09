@@ -138,11 +138,12 @@ export class AuthController {
     description: 'Access token refreshed successfully.',
   })
   @ApiResponse({ status: 401, description: 'Invalid refresh-token.' })
-  async refresh(
-    @Body() refreshTokenDto: RefreshTokenDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async refresh(@Req() req: any, @Res({ passthrough: true }) res: Response) {
     try {
+      const refreshTokenDto = {
+        refreshToken: req.cookies.refreshToken,
+        deviceId: req.cookies.deviceId,
+      };
       const newAccessToken = (await this.authService.refresh(refreshTokenDto))
         .accessToken;
       res.setHeader('Authorization', 'Bearer ' + newAccessToken);
