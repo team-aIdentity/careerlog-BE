@@ -220,10 +220,13 @@ export class AuthController {
       user,
       true,
     );
+    const deviceId = Array.from({ length: 16 }, () =>
+      Math.floor(Math.random() * 36).toString(36),
+    ).join('');
 
     await this.userService.setUserOAuth(
       user.id,
-      'kakao',
+      deviceId,
       refreshToken,
       true,
       'kakao',
@@ -241,17 +244,15 @@ export class AuthController {
       sameSite: 'none',
       secure: true,
     });
-    res.cookie('deviceId', 'kakao', {
+    res.cookie('deviceId', deviceId, {
       httpOnly: true,
       sameSite: 'none',
       secure: true,
     });
 
-    return res.send({
-      message: 'login success',
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-    });
+    const redirectUrl = `https://cont-career.com?message=login%20success&accessToken=${accessToken}&refreshToken=${refreshToken}&deviceId=${deviceId}`;
+
+    return res.redirect(redirectUrl);
   }
 
   @Post('send-phone-verify-code')
