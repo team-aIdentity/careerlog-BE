@@ -250,7 +250,7 @@ export class AuthController {
       secure: true,
     });
 
-    const redirectUrl = `https://cont-career.com?message=login%20success&accessToken=${accessToken}&refreshToken=${refreshToken}&deviceId=${deviceId}`;
+    const redirectUrl = `https://cont-career.com`;
 
     return res.redirect(redirectUrl);
   }
