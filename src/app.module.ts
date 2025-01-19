@@ -33,6 +33,8 @@ import { CertificationModule } from './certification/certification.module';
 import { LanguageModule } from './language/language.module';
 import { ReviewModule } from './review/review.module';
 import { RecommendKeywordModule } from './recommend-keyword/recommend-keyword.module';
+import { ResumeModule } from './resume/resume.module';
+import { ShareModule } from './share/share.module';
 
 @Module({
   imports: [
@@ -61,6 +63,8 @@ import { RecommendKeywordModule } from './recommend-keyword/recommend-keyword.mo
     LanguageModule,
     ReviewModule,
     RecommendKeywordModule,
+    ResumeModule,
+    ShareModule,
   ],
   controllers: [
     AppController,

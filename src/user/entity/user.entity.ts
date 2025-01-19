@@ -25,6 +25,8 @@ import { Link } from 'src/link/entity/link.entity';
 import { Certification } from 'src/certification/entity/certification.entity';
 import { Language } from 'src/language/entity/language.entity';
 import { Review } from 'src/review/entity/review.entity';
+import { resume_profile } from 'src/resume/entity/resumeProfile.entity';
+import { share_profile } from 'src/share/entity/shareProfile.entity';
 
 @Entity()
 export class User {
@@ -99,6 +101,12 @@ export class User {
 
   @OneToMany(() => Review, (review) => review.user)
   reviews: Review[];
+
+  @OneToOne(() => resume_profile, (resumeProfile) => resumeProfile.user)
+  resumeProfile: resume_profile;
+
+  @OneToOne(() => share_profile, (shareProfile) => shareProfile.user)
+  shareProfile: share_profile;
 
   @CreateDateColumn()
   createdAt: Date;

@@ -17,6 +17,8 @@ import { SavedArticle } from 'src/article/entity/savedArticle.entity';
 import { Product } from 'src/product/entity/product.entity';
 import { SavedProduct } from 'src/product/entity/savedProduct.entity';
 import { SecondaryOccupation } from 'src/career/entity/secondaryOccupation.entity';
+import { share_profile } from 'src/share/entity/shareProfile.entity';
+import { resume_profile } from 'src/resume/entity/resumeProfile.entity';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { SecondaryOccupation } from 'src/career/entity/secondaryOccupation.entit
       Product,
       SavedProduct,
       SecondaryOccupation,
+      resume_profile,
+      share_profile,
     ]),
     ConfigModule,
   ],
