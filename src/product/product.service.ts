@@ -550,6 +550,17 @@ export class ProductService {
     this.logger.log(
       `Adding product with ID: ${productId} to cart for userId: ${userId}`,
     );
+    const existingCart = await this.cartRepository.findOneBy({
+      user: { id: userId },
+      product: { id: productId },
+    });
+
+    if (existingCart) {
+      existingCart.isBought = isBought;
+      this.cartRepository.save(existingCart);
+      return existingCart;
+    }
+
     await this.cartRepository.save({
       user: { id: userId },
       product: { id: productId },
