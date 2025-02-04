@@ -1,17 +1,21 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { TossPaymentDto } from './dto/tossPayments.dto';
 import axios from 'axios';
+import { ProductService } from 'src/product/product.service';
 
 @Injectable()
 export class PaymentsService {
   private readonly tossURL = 'https://api.tosspayments.com/v1/payments/confirm';
   private readonly secretKey = process.env.TOSS_SECRET_KEY;
 
+  constructor(private readonly productService: ProductService) {}
+
   async tossPayment(tossPaymentDto: TossPaymentDto) {
     console.log('>>>>>>>>>', this.secretKey);
-    const { orderId, amount, paymentKey } = tossPaymentDto;
+    const { orderId, amount, paymentKey, cartId } = tossPaymentDto;
 
     try {
+      await this.productService.checkBought(cartId);
       const response = await axios.post(
         `${this.tossURL}`,
         {

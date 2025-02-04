@@ -533,6 +533,19 @@ export class ProductService {
     };
   }
 
+  async checkBought(cartId: number) {
+    this.logger.log(`check is bought true for cartId: ${cartId}`);
+    const cart = await this.cartRepository.findOne({ where: { id: cartId } });
+
+    if (!cart) throw new Error(`There is no cart with id ${cartId}`);
+
+    cart.isBought = true;
+
+    await this.cartRepository.save(cart);
+
+    return cart;
+  }
+
   async addCart(productId: number, userId: number) {
     this.logger.log(
       `Adding product with ID: ${productId} to cart for userId: ${userId}`,
