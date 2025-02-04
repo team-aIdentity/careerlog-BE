@@ -511,7 +511,11 @@ export class ProductController {
   @Put('check-bought')
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({ summary: 'check bought true' })
-  @ApiParam({ name: 'cartId', description: 'Cart ID' })
+  @ApiQuery({
+    name: 'cartId',
+    required: true,
+    description: 'cartId',
+  })
   @ApiResponse({
     status: 200,
     description: 'cart check boughtsuccessfully.',
