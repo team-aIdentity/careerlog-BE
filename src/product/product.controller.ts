@@ -508,6 +508,18 @@ export class ProductController {
     });
   }
 
+  @Put('check-bought')
+  @UseGuards(JwtAccessAuthGuard)
+  @ApiOperation({ summary: 'check bought true' })
+  @ApiParam({ name: 'cartId', description: 'Cart ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'cart check boughtsuccessfully.',
+  })
+  async checkBought(@Query('cartId') cartId: number) {
+    return await this.productService.checkBought(cartId);
+  }
+
   @Post('cart')
   @UseGuards(JwtAccessAuthGuard)
   @ApiOperation({ summary: 'Add a product to cart' })
