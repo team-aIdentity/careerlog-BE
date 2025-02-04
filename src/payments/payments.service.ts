@@ -4,7 +4,7 @@ import axios from 'axios';
 
 @Injectable()
 export class PaymentsService {
-  private readonly tossURL = 'https://api.tosspayments.com/v1/payments';
+  private readonly tossURL = 'https://api.tosspayments.com/v1/payments/confirm';
   private readonly secretKey = process.env.TOSS_SECRET_KEY;
 
   async tossPayment(tossPaymentDto: TossPaymentDto) {
@@ -13,14 +13,15 @@ export class PaymentsService {
 
     try {
       const response = await axios.post(
-        `${this.tossURL}/${paymentKey}`,
+        `${this.tossURL}`,
         {
           orderId,
           amount,
+          paymentKey,
         },
         {
           headers: {
-            Authorization: `Basic ${Buffer.from(`${this.secretKey}:`).toString()}`,
+            Authorization: `Basic ${Buffer.from(`${this.secretKey}:`).toString('base64')}`,
             'Content-Type': 'application/json',
           },
         },
