@@ -546,13 +546,14 @@ export class ProductService {
     return cart;
   }
 
-  async addCart(productId: number, userId: number) {
+  async addCart(productId: number, userId: number, isBought: boolean) {
     this.logger.log(
       `Adding product with ID: ${productId} to cart for userId: ${userId}`,
     );
     await this.cartRepository.save({
       user: { id: userId },
       product: { id: productId },
+      isBought: isBought,
       expiredIn: new Date().getTime() + 3 * 28 * 24 * 60 * 60 * 1000,
     });
 

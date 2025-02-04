@@ -532,8 +532,16 @@ export class ProductController {
     status: 200,
     description: 'Product added to cart successfully.',
   })
-  async addCart(@Req() req: any, @Query('productId') productId: number) {
-    return await this.productService.addCart(productId, req.user.id);
+  async addCart(
+    @Req() req: any,
+    @Query('productId') productId: number,
+    @Query('isBought') isBought?: boolean,
+  ) {
+    return await this.productService.addCart(
+      productId,
+      req.user.id,
+      isBought || false,
+    );
   }
 
   @Delete('cart')
