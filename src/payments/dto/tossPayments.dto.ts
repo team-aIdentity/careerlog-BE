@@ -9,7 +9,4 @@ export class TossPaymentDto {
 
   @IsNotEmpty()
   amount: number;
-
-  @IsNotEmpty()
-  cartId: number;
 }
