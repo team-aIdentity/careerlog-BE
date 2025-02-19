@@ -1,42 +1,45 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsBoolean,
-  IsEmail,
-  IsOptional,
-} from 'class-validator';
+import { IsString, IsBoolean, IsEmail, IsOptional } from 'class-validator';
 
 export class CreateResumeProfileDto {
   @IsString()
-  @IsNotEmpty()
-  name: string;
+  @IsOptional()
+  name?: string;
 
   @IsBoolean()
-  isNameInclude: boolean;
+  @IsOptional()
+  isNameInclude?: boolean;
 
   @IsString()
-  job: string;
+  @IsOptional()
+  job?: string;
 
   @IsBoolean()
-  isJobInclude: boolean;
+  @IsOptional()
+  isJobInclude?: boolean;
 
   @IsEmail()
-  email: string;
+  @IsOptional()
+  email?: string;
 
   @IsBoolean()
-  isEmailInclude: boolean;
+  @IsOptional()
+  isEmailInclude?: boolean;
 
   @IsString()
-  phoneNumber: string;
+  @IsOptional()
+  phoneNumber?: string;
 
   @IsBoolean()
-  isPhoneNumberInclude: boolean;
+  @IsOptional()
+  isPhoneNumberInclude?: boolean;
 
   @IsString()
-  address: string;
+  @IsOptional()
+  address?: string;
 
   @IsBoolean()
-  isAddressInclude: boolean;
+  @IsOptional()
+  isAddressInclude?: boolean;
 
   @IsString()
   @IsOptional()

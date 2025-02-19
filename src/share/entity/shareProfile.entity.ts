@@ -13,43 +13,43 @@ export class share_profile {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   name: string;
 
   @Column({ nullable: false, default: true })
   isNamePublic: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   job: string;
 
   @Column({ nullable: false, default: true })
   isJobPublic: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   email: string;
 
   @Column({ nullable: false, default: true })
   isEmailPublic: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   phoneNumber: string;
 
   @Column({ nullable: false, default: true })
   isPhoneNumberPublic: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   address: string;
 
   @Column({ nullable: false, default: true })
   isAddressPublic: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   introductionTitle: string;
 
   @Column({ nullable: false, default: true })
   isIntroductionTitlePublic: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   introductionContent: string;
 
   @Column({ nullable: false, default: true })

@@ -13,31 +13,31 @@ export class resume_profile {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true })
   name: string;
 
   @Column({ nullable: false, default: true })
   isNameInclude: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   job: string;
 
   @Column({ nullable: false, default: true })
   isJobInclude: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   email: string;
 
   @Column({ nullable: false, default: true })
   isEmailInclude: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   phoneNumber: string;
 
   @Column({ nullable: false, default: true })
   isPhoneNumberInclude: boolean;
 
-  @Column()
+  @Column({ nullable: true })
   address: string;
 
   @Column({ nullable: false, default: true })

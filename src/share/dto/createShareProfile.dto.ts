@@ -1,54 +1,59 @@
-import {
-  IsNotEmpty,
-  IsString,
-  IsBoolean,
-  IsEmail,
-  IsOptional,
-} from 'class-validator';
+import { IsString, IsBoolean, IsEmail, IsOptional } from 'class-validator';
 
 export class CreateShareProfileDto {
   @IsString()
-  @IsNotEmpty()
-  name: string;
+  @IsOptional()
+  name?: string;
 
   @IsBoolean()
-  isNamePublic: boolean;
+  @IsOptional()
+  isNamePublic?: boolean;
 
   @IsString()
-  job: string;
+  @IsOptional()
+  job?: string;
 
   @IsBoolean()
-  isJobPublic: boolean;
+  @IsOptional()
+  isJobPublic?: boolean;
 
   @IsEmail()
-  email: string;
+  @IsOptional()
+  email?: string;
 
   @IsBoolean()
-  isEmailPublic: boolean;
+  @IsOptional()
+  isEmailPublic?: boolean;
 
   @IsString()
-  phoneNumber: string;
+  @IsOptional()
+  phoneNumber?: string;
 
   @IsBoolean()
-  isPhoneNumberPublic: boolean;
+  @IsOptional()
+  isPhoneNumberPublic?: boolean;
 
   @IsString()
-  address: string;
+  @IsOptional()
+  address?: string;
 
   @IsBoolean()
-  isAddressPublic: boolean;
+  @IsOptional()
+  isAddressPublic?: boolean;
 
   @IsString()
   @IsOptional()
   introductionTitle?: string;
 
   @IsBoolean()
-  isIntroductionTitlePublic: boolean;
+  @IsOptional()
+  isIntroductionTitlePublic?: boolean;
 
   @IsString()
   @IsOptional()
   introductionContent?: string;
 
   @IsBoolean()
-  isIntroductionContentPublic: boolean;
+  @IsOptional()
+  isIntroductionContentPublic?: boolean;
 }
