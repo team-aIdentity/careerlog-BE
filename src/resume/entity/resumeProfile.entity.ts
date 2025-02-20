@@ -53,7 +53,7 @@ export class resume_profile {
   @OneToOne(() => User, (user) => user.resumeProfile, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn()
   user: User;
 
   @CreateDateColumn()

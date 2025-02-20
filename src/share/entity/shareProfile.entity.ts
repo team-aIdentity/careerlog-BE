@@ -3,6 +3,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -58,7 +59,7 @@ export class share_profile {
   @OneToOne(() => User, (user) => user.shareProfile, {
     onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn()
   user: User;
 
   @CreateDateColumn()
