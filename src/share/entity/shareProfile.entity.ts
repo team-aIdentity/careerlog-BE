@@ -58,6 +58,7 @@ export class share_profile {
   @OneToOne(() => User, (user) => user.shareProfile, {
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @CreateDateColumn()
