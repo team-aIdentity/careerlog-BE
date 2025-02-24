@@ -37,15 +37,21 @@ export class ResumeService {
 
     const result = {
       name: resumeProfile.isNameInclude ? resumeProfile.name : '',
+      isNameInclude: resumeProfile.isNameInclude,
       job: resumeProfile.isJobInclude ? resumeProfile.job : '',
+      isJobInclude: resumeProfile.isJobInclude,
       email: resumeProfile.isEmailInclude ? resumeProfile.email : '',
+      isEmailInclude: resumeProfile.isEmailInclude,
       phoneNumber: resumeProfile.isPhoneNumberInclude
         ? resumeProfile.phoneNumber
         : '',
+      isPhoneNumberInclude: resumeProfile.isPhoneNumberInclude,
       address: resumeProfile.isAddressInclude ? resumeProfile.address : '',
+      isAddressInclude: resumeProfile.isPhoneNumberInclude,
       coreAbility: resumeProfile.isCoreAbilityInclude
         ? resumeProfile.coreAbility
         : '',
+      isCoreAbilityInclude: resumeProfile.isCoreAbilityInclude,
     };
     return result;
   }

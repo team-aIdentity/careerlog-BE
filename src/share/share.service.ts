@@ -41,18 +41,25 @@ export class ShareService {
 
     const result = {
       name: shareProfile.isNamePublic ? shareProfile.name : '',
+      isNamePublic: shareProfile.isNamePublic,
       job: shareProfile.isJobPublic ? shareProfile.job : '',
+      isJobPublic: shareProfile.isJobPublic,
       email: shareProfile.isEmailPublic ? shareProfile.email : '',
+      isEmailPublic: shareProfile.isEmailPublic,
       phoneNumber: shareProfile.isPhoneNumberPublic
         ? shareProfile.phoneNumber
         : '',
+      isPhoneNumberPublic: shareProfile.isPhoneNumberPublic,
       address: shareProfile.isAddressPublic ? shareProfile.address : '',
+      isAddressPublic: shareProfile.isAddressPublic,
       introductionTitle: shareProfile.isIntroductionTitlePublic
         ? shareProfile.introductionTitle
         : '',
+      isIntroductionTitlePublic: shareProfile.isIntroductionTitlePublic,
       introductionContent: shareProfile.isIntroductionContentPublic
         ? shareProfile.introductionContent
         : '',
+      isIntroductionContentPublic: shareProfile.isIntroductionContentPublic,
     };
     return result;
   }
