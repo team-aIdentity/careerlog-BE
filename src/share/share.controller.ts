@@ -53,7 +53,7 @@ export class ShareController {
     return await this.shareService.create(createShareProfileDto, req.user.id);
   }
 
-  @Get()
+  @Get(':user_id')
   @ApiOperation({
     summary: 'Get the share profile for the specified user',
   })
