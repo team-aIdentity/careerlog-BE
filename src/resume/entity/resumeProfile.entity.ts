@@ -44,7 +44,7 @@ export class resume_profile {
   @Column({ nullable: false, default: true })
   isAddressInclude: boolean;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text', nullable: true })
   coreAbility: string;
 
   @Column({ nullable: false, default: true })
